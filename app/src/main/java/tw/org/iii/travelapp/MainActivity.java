@@ -39,6 +39,7 @@ public class MainActivity extends Activity {
         data2 = new String[]{};
         myAdapter = new MyAdapter(MainActivity.this);
         main_list.setAdapter(myAdapter);
+        main_list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         main_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -70,11 +71,13 @@ public class MainActivity extends Activity {
     }
     //我的最愛
     private void gotoFavorite(){
-
+        Intent intent = new Intent(this, FavoriteActivity.class);
+        startActivity(intent);
     }
     //更換佈景主題
     private void gotoTheme(){
-
+        Intent intent = new Intent(this, ThemesActivity.class);
+        startActivity(intent);
     }
     //關於我選單
     private void gotoAboutMe() {
