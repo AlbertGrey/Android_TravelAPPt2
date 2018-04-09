@@ -3,16 +3,20 @@ package tw.org.iii.travelapp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -23,6 +27,8 @@ public class MainActivity extends Activity {
     private Button btnConfirm;
     private String [] data1, data2;
     private MyAdapter myAdapter;
+    private LinearLayout iv_home, iv_guide, iv_camera, iv_search, iv_setting;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +36,14 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         main_list = findViewById(R.id.main_list);
+        iv_home = findViewById(R.id.btn_home);
+        iv_guide = findViewById(R.id.btn_guide);
+        iv_camera = findViewById(R.id.btn_camera);
+        iv_search = findViewById(R.id.btn_search);
+        iv_setting = findViewById(R.id.btn_setting);
 
         init();
+        setIconListener();
     }
 
     private void init(){
@@ -43,7 +55,7 @@ public class MainActivity extends Activity {
         main_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.v("brad", "" + position);
+//                Log.v("brad", "" + position);
                 switch (position){
                     case 0:
                         gotoProfile();
@@ -62,6 +74,66 @@ public class MainActivity extends Activity {
             }
         });
     }
+
+    private void setIconListener(){
+
+        iv_home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iv_home.setBackgroundColor(Color.rgb(169,169,169));
+                iv_guide.setBackgroundColor(Color.BLACK);
+                iv_camera.setBackgroundColor(Color.BLACK);
+                iv_search.setBackgroundColor(Color.BLACK);
+                iv_setting.setBackgroundColor(Color.BLACK);
+
+            }
+        });
+
+        iv_guide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iv_home.setBackgroundColor(Color.BLACK);
+                iv_guide.setBackgroundColor(Color.rgb(169,169,169));
+                iv_camera.setBackgroundColor(Color.BLACK);
+                iv_search.setBackgroundColor(Color.BLACK);
+                iv_setting.setBackgroundColor(Color.BLACK);
+            }
+        });
+
+        iv_camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iv_home.setBackgroundColor(Color.BLACK);
+                iv_guide.setBackgroundColor(Color.BLACK);
+                iv_camera.setBackgroundColor(Color.rgb(169,169,169));
+                iv_search.setBackgroundColor(Color.BLACK);
+                iv_setting.setBackgroundColor(Color.BLACK);
+            }
+        });
+
+        iv_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iv_home.setBackgroundColor(Color.BLACK);
+                iv_guide.setBackgroundColor(Color.BLACK);
+                iv_camera.setBackgroundColor(Color.BLACK);
+                iv_search.setBackgroundColor(Color.rgb(169,169,169));
+                iv_setting.setBackgroundColor(Color.BLACK);
+            }
+        });
+
+        iv_setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iv_home.setBackgroundColor(Color.BLACK);
+                iv_guide.setBackgroundColor(Color.BLACK);
+                iv_camera.setBackgroundColor(Color.BLACK);
+                iv_search.setBackgroundColor(Color.BLACK);
+                iv_setting.setBackgroundColor(Color.rgb(169,169,169));
+            }
+        });
+    }
+
 
 
     //個人資料選單
@@ -91,7 +163,7 @@ public class MainActivity extends Activity {
         popupWindow.setTouchInterceptor(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.v("brad", event.toString());
+//                Log.v("brad", event.toString());
                 if(event.getAction() == MotionEvent.ACTION_UP){
 
                     popupWindow.dismiss();
