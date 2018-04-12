@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -19,12 +20,24 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
 public class FavoriteActivity extends AppCompatActivity {
+
     private ListView favorite_list;
     private FavoriteActivity.MyAdapter myAdapter;
     private float screenWidth, screenHeight, newHeight;
@@ -36,6 +49,10 @@ public class FavoriteActivity extends AppCompatActivity {
     private String [] string_title;
     private int [] int_imgs;
     private Set<String> set_title;
+    private String description, img_url;
+    private ArrayList<DataStation> dataList;
+    private Bitmap bitmap;
+    private ArrayList<Bitmap> bitmapArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +67,15 @@ public class FavoriteActivity extends AppCompatActivity {
                 R.drawable.dajiamazu, R.drawable.bell_cake};
 
         set_title = new HashSet<>();
-
+        dataList = new ArrayList<>();
+        bitmapArrayList = new ArrayList<>();
         favorite_list = findViewById(R.id.favorite_list);
+
+        MyTask myTask = new MyTask();
+        myTask.execute("http://36.234.13.158:8080/J2EE/getData.jsp?start=0&rows=10");
         getScreenSize();
-        init();
+//        init();
+
 
     }
     //取得螢幕大小
@@ -66,6 +88,7 @@ public class FavoriteActivity extends AppCompatActivity {
     }
 
     private void init(){
+
         sp = getSharedPreferences("favoritedata", MODE_PRIVATE);
         editor = sp.edit();
 
@@ -154,7 +177,7 @@ public class FavoriteActivity extends AppCompatActivity {
         //取得list的數量
         @Override
         public int getCount() {
-            return imgs.size();
+            return dataList.size();
         }
 
         @Override
@@ -179,36 +202,235 @@ public class FavoriteActivity extends AppCompatActivity {
             removeTv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    imgs.remove(position);
-                    title.remove(position);
+//                    imgs.remove(position);
+//                    title.remove(position);
+                    dataList.remove(position);
+                    bitmapArrayList.remove(position);
                     myAdapter.notifyDataSetChanged();
                 }
             });
             //給值
-            item_img.setImageResource(imgs.get(position));
-            item_title.setText(title.get(position));
+//            item_img.setImageResource(imgs.get(position));
+//            item_title.setText(title.get(position));
+            item_title.setText(dataList.get(position).getDescription());
 
-            Resources res = getResources();
-            Bitmap bitmap = BitmapFactory.decodeResource(res, imgs.get(position));
-            //原圖大小
-            int width = bitmap.getWidth();
-            int height = bitmap.getHeight();
-            //想要的大小
-            int newWidth = (int)screenWidth;
-            //縮放倍率
-            float scalWidth = (float)newWidth / width;
-            float scalHeight = newHeight / height;
-            Log.v("brad", "" + width +":" + height + "\n" +
-                    newWidth + ":" + newHeight + "\n" +
-                    scalWidth + ":" + scalHeight);
-            Matrix matrix = new Matrix();
-            matrix.postScale(scalWidth, scalHeight);
+//            Resources res = getResources();
+//            Bitmap bitmap = BitmapFactory.decodeResource(res, imgs.get(position));
+//            //原圖大小
+//            int width = bitmap.getWidth();
+//            int height = bitmap.getHeight();
+//            //想要的大小
+//            int newWidth = (int)screenWidth;
+//            //縮放倍率
+//            float scalWidth = (float)newWidth / width;
+//            float scalHeight = newHeight / height;
+//            Log.v("brad", "" + width +":" + height + "\n" +
+//                    newWidth + ":" + newHeight + "\n" +
+//                    scalWidth + ":" + scalHeight);
+//            Matrix matrix = new Matrix();
+//            matrix.postScale(scalWidth, scalHeight);
             //取得新的圖
-            bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-            item_img.setImageBitmap(bitmap);
+//            bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+//            item_img.setImageBitmap(bitmap);
 
+            String imgURL = dataList.get(position).getImg_url();
+            StringBuilder sb = new StringBuilder(imgURL);
+            sb.insert(4,"s");
+            Log.v("brad", "URL:" + sb.toString());
+            Log.v("brad", "bitmapArrayList.size():"+bitmapArrayList.size());
+
+//            new GetImageFromURL(item_img).execute(sb.toString());
+            item_img.setImageBitmap(bitmapArrayList.get(position));
             //回傳convertView
             return convertView;
+        }
+    }
+    //解析JSON字串
+    private void parseJSON(String s){
+        int time = 1;
+        try {
+            JSONArray array = new JSONArray(s);
+            for (int i=0; i<array.length(); i++){
+                JSONObject obj = array.getJSONObject(i);
+                JSONArray imgs = obj.getJSONArray("imgs");
+//                for(int x = 0; x < imgs.length(); x++){
+                JSONObject obj2 = imgs.getJSONObject(0);
+                description = obj2.getString("description");
+                img_url = obj2.getString("url");
+//                }
+                String cat2 = obj.getString("CAT2");
+                String xbody = obj.getString("xbody");
+                String address = obj.getString("address");
+                String stitle = obj.getString("stitle");
+                String memo_time = obj.getString("MEMO_TIME");
+                double lng = obj.getDouble("lng");
+                double lat = obj.getDouble("lat");
+
+//                Log.v("brad:","img->"+description+"/"+img_url+" /"+cat2+"/"+xbody+"/"+address+"/"+stitle+"/"+memo_time+"/"+lng+"/"+lat);
+                Log.v("brad", time + "." + description);
+                Log.v("brad", img_url);
+                DataStation t = new DataStation(description, img_url);
+//                Log.v("brad", "T是：" + t.toString());
+                dataList.add(t);
+                time++;
+            }
+
+            String last = dataList.get(dataList.size()-1).getImg_url();
+            Log.v("brad", "最後一個Img_url是:" + last);
+
+
+
+
+
+        } catch (JSONException e) {
+            Log.v("brad", e.toString());
+        }
+
+    }
+
+
+    private class MyTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String data = getData(strings[0]);
+//            Log.v("brad", "URL:" + img_url);
+            parseJSON(data);
+
+
+            for(int i = 0; i < dataList.size(); i++) {
+                StringBuilder sb = new StringBuilder(dataList.get(i).getImg_url());
+                sb.insert(4,"s");
+//                new GetImageFromURL().execute(sb.toString());
+//                Log.v("brad", "URL123:" + sb.toString());
+
+                String urldiaplay = sb.toString();
+                bitmap = null;
+                try {
+//                URL newurl = new URL(urldiaplay);
+//                HttpURLConnection conn = (HttpURLConnection) newurl.openConnection();
+//                conn.setDoInput(true);
+//                conn.connect();
+//                InputStream srt = conn.getInputStream();
+                    InputStream srt = new URL(urldiaplay).openStream();
+                    bitmap = BitmapFactory.decodeStream(srt);
+
+                    //原圖大小
+                    int width = bitmap.getWidth();
+                    int height = bitmap.getHeight();
+                    //想要的大小
+                    int newWidth = (int)screenWidth;
+                    //縮放倍率
+                    float scalWidth = (float)newWidth / width;
+                    float scalHeight = newHeight / height;
+                    Log.v("brad", "" + width +":" + height + "\n" +
+                            newWidth + ":" + newHeight + "\n" +
+                            scalWidth + ":" + scalHeight);
+                    Matrix matrix = new Matrix();
+                    matrix.postScale(scalWidth, scalHeight);
+                    //取得新的圖
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+                    bitmapArrayList.add(bitmap);
+                    Log.v("brad", "bitmap.size:" + bitmapArrayList.size());
+
+                } catch (Exception e) {
+                    Log.v("brad", e.toString());
+                }
+
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+
+            init();
+//            StringBuilder sb = new StringBuilder(img_url);
+//            sb.insert(4,"s");
+//            Log.v("brad", "URL:" + sb.toString());
+//            new GetImageFromURL(iv).execute(sb.toString());
+
+//            Log.v("brad", "dataList.size():"+dataList.get(9).getImg_url());
+
+        }
+
+        private String getData(String url){
+            StringBuffer sb = new StringBuffer();
+            try {
+                URL newURL = new URL(url);
+                BufferedReader br = new BufferedReader(
+                        new InputStreamReader(newURL.openStream()));
+                String line;
+                while( (line = br.readLine()) != null){
+                    Log.v("brad", line);
+                    sb.append(line);
+                }
+            } catch (MalformedURLException e) {
+                Log.v("brad", e.toString());
+            } catch (IOException e) {
+                Log.v("brad", e.toString());
+            }
+            return sb.toString();
+        }
+    }
+    //從URL取得圖片
+    public class GetImageFromURL extends AsyncTask<String, Void, Bitmap>{
+
+        ImageView imageView;
+
+        public GetImageFromURL(){
+
+        }
+
+        public GetImageFromURL(ImageView imageView){
+            this.imageView = imageView;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... url) {
+            String urldiaplay = url[0];
+            bitmap = null;
+            try {
+//                URL newurl = new URL(urldiaplay);
+//                HttpURLConnection conn = (HttpURLConnection) newurl.openConnection();
+//                conn.setDoInput(true);
+//                conn.connect();
+//                InputStream srt = conn.getInputStream();
+                InputStream srt = new URL(urldiaplay).openStream();
+                bitmap = BitmapFactory.decodeStream(srt);
+
+                //原圖大小
+                int width = bitmap.getWidth();
+                int height = bitmap.getHeight();
+                //想要的大小
+                int newWidth = (int)screenWidth;
+                //縮放倍率
+                float scalWidth = (float)newWidth / width;
+                float scalHeight = newHeight / height;
+                Log.v("brad", "" + width +":" + height + "\n" +
+                        newWidth + ":" + newHeight + "\n" +
+                        scalWidth + ":" + scalHeight);
+                Matrix matrix = new Matrix();
+                matrix.postScale(scalWidth, scalHeight);
+                //取得新的圖
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+                bitmapArrayList.add(bitmap);
+                Log.v("brad", "bitmap.size:" + bitmapArrayList.size());
+
+            } catch (Exception e) {
+                Log.v("brad", e.toString());
+            }
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+
+
+//            imageView.setImageBitmap(bitmap);
         }
     }
 }

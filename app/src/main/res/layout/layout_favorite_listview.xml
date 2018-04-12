@@ -9,7 +9,7 @@
         android:id="@+id/favorite_item_img"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/aa"
+
         android:padding="5dp"
         android:scaleType="fitXY"
 
