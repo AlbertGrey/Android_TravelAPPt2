@@ -27,4 +27,15 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     implementation 'de.hdodenhof:circleimageview:2.2.0'
+
+    //image loading library Glide
+    compile 'com.github.bumptech.glide:glide:4.0.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
+
+    //Android's support library for the framework (necessary for Glide)
+    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+
+    //volley
+    compile 'com.android.volley:volley:1.1.0'
 }

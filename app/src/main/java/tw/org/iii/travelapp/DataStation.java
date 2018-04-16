@@ -1,10 +1,12 @@
 package tw.org.iii.travelapp;
 
+import java.util.HashSet;
+
 /**
  * Created by MacGyver on 2018/4/11.
  */
 
-public class DataStation {
+public class DataStation extends HashSet<String>{
     String description;
     String img_url;
     String cat2;
@@ -18,8 +20,8 @@ public class DataStation {
 
     }
 
-    public DataStation(String description, String img_url) {
-        this.description = description;
+    public DataStation(String stitle, String img_url) {
+        this.stitle = stitle;
         this.img_url = img_url;
     }
 

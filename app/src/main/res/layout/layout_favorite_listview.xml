@@ -8,8 +8,7 @@
     <ImageView
         android:id="@+id/favorite_item_img"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
+        android:layout_height="200dp"
         android:padding="5dp"
         android:scaleType="fitXY"
 
@@ -26,20 +25,17 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:text="沙鹿肉圓福"
             android:textSize="20sp"
             android:textStyle="bold"
             android:gravity="center"
             />
 
-        <TextView
+        <ImageView
             android:id="@+id/favorite_remove"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="移除"
-            android:textSize="16sp"
-            android:textStyle="bold"
+            android:src="@drawable/ic_delete_item"
             android:gravity="center"
             />
 
