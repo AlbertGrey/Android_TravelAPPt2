@@ -20,9 +20,10 @@ public class DataStation extends HashSet<String>{
 
     }
 
-    public DataStation(String stitle, String img_url) {
+    public DataStation(String stitle, String img_url, String xbody) {
         this.stitle = stitle;
         this.img_url = img_url;
+        this.xbody = xbody;
     }
 
     public String getDescription() {

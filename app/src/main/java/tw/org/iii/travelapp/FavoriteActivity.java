@@ -1,6 +1,7 @@
 package tw.org.iii.travelapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
@@ -68,11 +69,8 @@ public class FavoriteActivity extends AppCompatActivity {
     private LinkedList<Integer> imgs;
     private String stitle, img_url;
     private ArrayList<DataStation> dataList;
-    private Set<String> set_title;
-    private StringBuffer sb;
     private RequestQueue queue;
     private String url = "http://36.234.10.186:8080/J2EE/getData.jsp?start=0&rows=10";
-    int i;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +113,15 @@ public class FavoriteActivity extends AppCompatActivity {
         favorite_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.v("brad", "" + position);
+                String img_url = dataList.get(position).getImg_url();
+                String stitle = dataList.get(position).getStitle();
+                String xbody = dataList.get(position).getXbody();
+
+                Intent intent = new Intent(FavoriteActivity.this, DetailActivity.class);
+                intent.putExtra("stitle", stitle);
+                intent.putExtra("xbody", xbody);
+                intent.putExtra("img_url", img_url);
+                startActivity(intent);
            }
         });
     }
@@ -167,9 +173,6 @@ public class FavoriteActivity extends AppCompatActivity {
             TextView item_title = convertView.findViewById(R.id.favorite_item_title);
             ImageView removeTv = convertView.findViewById(R.id.favorite_remove);
 
-            String title = item_title.getText().toString();
-            Log.v("brad", "title" + title);
-
             //從我的最愛移除
             removeTv.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -183,7 +186,7 @@ public class FavoriteActivity extends AppCompatActivity {
             GlideApp
                     .with(FavoriteActivity.this)
                     .load(dataList.get(position).getImg_url())
-//                        .override((int)screenWidth, (int)newHeight)
+                        .override((int)screenWidth, (int)newHeight)
 //                        .centerCrop()
 //                        .placeholder(R.drawable.loading)
                     .into(item_img);
@@ -212,7 +215,7 @@ public class FavoriteActivity extends AppCompatActivity {
                 double lng = obj.getDouble("lng");
                 double lat = obj.getDouble("lat");
 
-                DataStation data = new DataStation(stitle, img_url);
+                DataStation data = new DataStation(stitle, img_url, xbody);
                 dataList.add(data);
             }
 

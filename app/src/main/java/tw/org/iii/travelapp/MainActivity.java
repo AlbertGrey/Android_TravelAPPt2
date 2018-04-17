@@ -1,11 +1,16 @@
 package tw.org.iii.travelapp;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +26,10 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import java.io.FileNotFoundException;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class MainActivity extends Activity {
     private ListView main_list;
     private PopupWindow popupWindow;
@@ -28,6 +37,7 @@ public class MainActivity extends Activity {
     private String [] data1, data2;
     private MyAdapter myAdapter;
     private LinearLayout iv_home, iv_guide, iv_camera, iv_search, iv_setting;
+    private CircleImageView circleImageView;
 
 
     @Override
@@ -41,6 +51,7 @@ public class MainActivity extends Activity {
         iv_camera = findViewById(R.id.btn_camera);
         iv_search = findViewById(R.id.btn_search);
         iv_setting = findViewById(R.id.btn_setting);
+        circleImageView = findViewById(R.id.main_photo);
 
         init();
         setIconListener();
@@ -70,9 +81,45 @@ public class MainActivity extends Activity {
                         gotoAboutMe();
                         break;
                 }
-
             }
         });
+
+        circleImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                //開啟Pictures畫面Type設定為image
+                intent.setType("image/*");
+                //使用Intent.ACTION_GET_CONTENT這個Action
+                //會開啟選取圖檔視窗讓您選取手機內圖檔
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                //取得相片後返回本畫面
+                startActivityForResult(intent, 1);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //當使用者按下確定後
+        if (resultCode == RESULT_OK) {
+            //取得圖檔的路徑位置
+            Uri uri = data.getData();
+            //寫log
+            Log.v("brad", uri.toString());
+            //抽象資料的接口
+            GlideApp
+                    .with(MainActivity.this)
+                    .load(data.getData())
+                    .circleCrop()
+//                    .override((int)screenWidth, (int)newHeight)
+//                        .centerCrop()
+//                        .placeholder(R.drawable.loading)
+                    .into(circleImageView);
+        }
+
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void setIconListener(){
