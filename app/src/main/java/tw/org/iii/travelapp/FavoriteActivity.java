@@ -70,7 +70,7 @@ public class FavoriteActivity extends AppCompatActivity {
     private String stitle, img_url;
     private ArrayList<DataStation> dataList;
     private RequestQueue queue;
-    private String url = "http://36.234.10.186:8080/J2EE/getData.jsp?start=0&rows=10";
+    private String url = "http://36.234.10.186:8080/fsit04/User_favorite";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +81,9 @@ public class FavoriteActivity extends AppCompatActivity {
 
         queue= Volley.newRequestQueue(this);
 
-//        getFavorite("1");
+        for(int i = 1; i <= 20; i++){
+            addFavorite("1", "" + i);
+        }
 
         dataList = new ArrayList<>();
         favorite_list = findViewById(R.id.favorite_list);
@@ -116,9 +118,10 @@ public class FavoriteActivity extends AppCompatActivity {
                 String img_url = dataList.get(position).getImg_url();
                 String stitle = dataList.get(position).getStitle();
                 String xbody = dataList.get(position).getXbody();
+                String total_id = dataList.get(position).getTotal_id();
 
                 Intent intent = new Intent(FavoriteActivity.this, DetailActivity.class);
-                intent.putExtra("stitle", stitle);
+                intent.putExtra("stitle", total_id + "." + stitle);
                 intent.putExtra("xbody", xbody);
                 intent.putExtra("img_url", img_url);
                 startActivity(intent);
@@ -128,7 +131,6 @@ public class FavoriteActivity extends AppCompatActivity {
 
     @Override
     public void finish() {
-
 
         super.finish();
     }
@@ -177,12 +179,16 @@ public class FavoriteActivity extends AppCompatActivity {
             removeTv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    String total_Id = dataList.get(position).getTotal_id();
+                    deleteFavorite("1", total_Id);
                     dataList.remove(position);
                     myAdapter.notifyDataSetChanged();
                 }
             });
+            String stitle = dataList.get(position).getStitle();
+            String total_id = dataList.get(position).getTotal_id();
 
-            item_title.setText(dataList.get(position).getStitle());
+            item_title.setText(total_id + "." + stitle);
             GlideApp
                     .with(FavoriteActivity.this)
                     .load(dataList.get(position).getImg_url())
@@ -201,21 +207,22 @@ public class FavoriteActivity extends AppCompatActivity {
             JSONArray array = new JSONArray(s);
             for (int i=0; i<array.length(); i++){
                 JSONObject obj = array.getJSONObject(i);
-                JSONArray imgs = obj.getJSONArray("imgs");
+                JSONArray imgs = obj.getJSONArray("Img");
 //                for(int x = 0; x < imgs.length(); x++){
                 JSONObject obj2 = imgs.getJSONObject(0);
+                String total_id = obj.getString("total_id");
                 String description = obj2.getString("description");
                 img_url = obj2.getString("url");
 //                }
                 String cat2 = obj.getString("CAT2");
                 String xbody = obj.getString("xbody");
                 String address = obj.getString("address");
-                stitle = obj.getString("stitle");
+                stitle = obj.getString("name");
                 String memo_time = obj.getString("MEMO_TIME");
                 double lng = obj.getDouble("lng");
                 double lat = obj.getDouble("lat");
 
-                DataStation data = new DataStation(stitle, img_url, xbody);
+                DataStation data = new DataStation(total_id, stitle, img_url, xbody);
                 dataList.add(data);
             }
 
@@ -257,63 +264,79 @@ public class FavoriteActivity extends AppCompatActivity {
             return sb.toString();
         }
     }
-    /**  http://36.234.13.158:8080/J2EE/addFavorite.jsp  加入我的最愛
+    /**  http://36.234.10.186 :8080/J2EE/addFavorite.jsp  加入我的最愛
      *
      * @param user_id     用戶id
-     * @param total_ids   地點的id
+     * @param total_id   地點的id
      */
-    private void addFavorite(String user_id,String[] total_ids){
-        String url ="http://36.234.10.186:8080/J2EE/addFavorite.jsp";
+    private void addFavorite(String user_id,String total_id){
+        String url ="http://36.234.10.186:8080/fsit04/User_favorite";
 
         final String p1 =user_id;
-        final String[] p2=total_ids;
-        try {
-            final JSONArray array = new JSONArray(p2);
+        final String p2=total_id;
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
 
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            Log.v("brad",response);
-                        }
-                    }, null){
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    HashMap<String,String> m1 =new HashMap<>();
-                    m1.put("user_id",p1);
-                    m1.put("total_ids", array.toString());
-                    Log.v("brad", "array.toString() = " + array.toString());
-                    return m1;
-                }
-            };
-            queue.add(stringRequest);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+                        Log.v("brad",response);
+                    }
+                }, null){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> m1 =new HashMap<>();
+                m1.put("user_id",p1);
+                m1.put("total_id", p2);
+                return m1;
+            }
+        };
+        queue.add(stringRequest);
     }
-    /** http://36.234.13.158:8080/J2EE/getFavorite.jsp 取得用戶我的最愛
+    /**  http://36.234.10.186 :8080/J2EE/addFavorite.jsp  刪除我的最愛
      *
+     * @param user_id     用戶id
+     * @param total_id   地點的id
+     */
+    private void deleteFavorite(String user_id,String total_id){
+        String url ="http://36.234.10.186:8080/fsit04/User_favorite";
+
+        final String p1 = user_id;
+        final String p2 = total_id;
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("brad",response);
+                    }
+                }, null){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String,String> m1 =new HashMap<>();
+                m1.put("_method","DELETE");
+                m1.put("user_id",p1);
+                m1.put("total_id", p2);
+
+                return m1;
+            }
+        };
+        queue.add(stringRequest);
+
+    }
+    /** 取得我的最愛
+     *  http://36.234.10.186:8080/fsit04/User_favorite
      * @param user_id 用戶id
      */
     private void getFavorite(String user_id){
         final String p1=user_id;
-        String url ="http://36.234.10.186:8080/J2EE/getFavorite.jsp";
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+        String url ="http://36.234.10.186:8080/fsit04/User_favorite?user_id="+p1;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         parseGetFavorite(response);
 
                     }
-                }, null){
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String,String> m1 =new HashMap<>();
-                m1.put("mail",p1);
-                return m1;
-            }
-        };
+                }, null);
 
         queue.add(stringRequest);
     }
@@ -354,9 +377,9 @@ public class FavoriteActivity extends AppCompatActivity {
                 JSONArray imgs =ob1.getJSONArray("Img");
                 for(int y= 0;y<array1.length();y++){
                     String description =imgs.getJSONObject(y).getString("description");
-                    Log.v("brad",description);
+                    Log.v("brad","111"+description);
                     String imgUrl = imgs.getJSONObject(y).getString("url");
-                    Log.v("brad",imgUrl);
+                    Log.v("brad","111"+imgUrl);
                 }
             }
         } catch (JSONException e) {

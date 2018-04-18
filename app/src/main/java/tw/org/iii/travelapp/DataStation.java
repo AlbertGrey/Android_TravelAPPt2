@@ -7,6 +7,7 @@ import java.util.HashSet;
  */
 
 public class DataStation extends HashSet<String>{
+    String total_id;
     String description;
     String img_url;
     String cat2;
@@ -20,10 +21,19 @@ public class DataStation extends HashSet<String>{
 
     }
 
-    public DataStation(String stitle, String img_url, String xbody) {
+    public DataStation(String total_id, String stitle, String img_url, String xbody) {
+        this.total_id = total_id;
         this.stitle = stitle;
         this.img_url = img_url;
         this.xbody = xbody;
+    }
+
+    public String getTotal_id() {
+        return total_id;
+    }
+
+    public void setTotal_id(String total_id) {
+        this.total_id = total_id;
     }
 
     public String getDescription() {
