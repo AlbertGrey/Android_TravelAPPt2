@@ -108,7 +108,7 @@ public class ProfileActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             //設置ListView的layout,沒有根目錄root值為null
-            convertView = inflater.inflate(R.layout.layout_item, null);
+            convertView = inflater.inflate(R.layout.layout_profile_item, null);
             //取得ListView layout的每個view
             TextView item_title = convertView.findViewById(R.id.item_title);
             item_content = convertView.findViewById(R.id.item_content);

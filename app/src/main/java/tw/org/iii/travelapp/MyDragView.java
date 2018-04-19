@@ -3,6 +3,7 @@ package tw.org.iii.travelapp;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -25,6 +26,7 @@ public class MyDragView extends LinearLayout{
     private float handInt,rowInt;
     private SimpleAdapter simpleAdapter;
     private int upOrdown;
+    private int  screenWidth,screenHeight;
     public MyDragView(Context context){
         super(context);
 
@@ -41,7 +43,12 @@ public class MyDragView extends LinearLayout{
         //利用mInflater 載入DragView的XML檔案
         LayoutInflater mInflater = LayoutInflater.from(context);
         myView = mInflater.inflate(R.layout.dragview, null);
-
+        DisplayMetrics metrics = new DisplayMetrics();
+        MapsActivity ma=(MapsActivity)context;
+        ma.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        screenWidth = metrics.widthPixels;
+        screenHeight = metrics.heightPixels;
+        Log.v("chad",screenHeight+"");
         addView(myView);
         intitListView();
 
@@ -74,7 +81,8 @@ public class MyDragView extends LinearLayout{
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
-        this.setY(0);
+        //這個一開始的高度
+        this.setY(screenHeight/2);
 
     }
     //判斷LISTVIEW 是否置頂
@@ -101,9 +109,15 @@ public class MyDragView extends LinearLayout{
 
         float xxx =rowInt-event.getRawY();
         float moveDiatance =this.getY()-xxx;
-        if(moveDiatance>0&&moveDiatance<1960-600) {
+        //標註手指移動範圍
+        /**
+         * screenHeight/2 上限
+         * screenHeight-screenHeight/3  下限
+         */
+        if(moveDiatance>screenHeight/2&&moveDiatance<screenHeight-screenHeight/3) {
             this.setY(moveDiatance);
         }
+        //手指手勢向上向下
         if(xxx>0){
             upOrdown =0;
         }else if(xxx<0){
@@ -112,12 +126,12 @@ public class MyDragView extends LinearLayout{
         if(event.getAction()==MotionEvent.ACTION_UP) {
             if(upOrdown==1){
                 Log.v("chad","movedown");
-                this.setY(1960-600);
+                this.setY(screenHeight-screenHeight/3);
                 upOrdown=2;
 
             }else if (upOrdown==0){
                 Log.v("chad","moveup");
-                this.setY(0);
+                this.setY(screenHeight/2);
                 upOrdown=2;
             }
         }
@@ -135,12 +149,12 @@ public class MyDragView extends LinearLayout{
                 float temp = handInt - ev.getY();
                 //向上差過20 而且LISTVIEW置頂代表ACTION_MOVE_UP return true 給onTouchEvent;
                 if (temp >20 ) {
-                    if(this.getY()!=0&&isFirstItemVisible()) {
+                    if(this.getY()!=screenHeight/2&&isFirstItemVisible()) {
                         return  true;
                     }
                 //向下差過20 而且LISTVIEW置頂代表ACTION_MOVE_Down return true 給onTouchEvent;
                 } else if (temp < -20) {
-                    if(this.getY()==0&&isFirstItemVisible()) {
+                    if(this.getY()==screenHeight/2&&isFirstItemVisible()) {
                         return  true;
                     }
                 }
