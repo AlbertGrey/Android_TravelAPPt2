@@ -21,11 +21,15 @@ public class DataStation extends HashSet<String>{
 
     }
 
-    public DataStation(String total_id, String stitle, String img_url, String xbody) {
+    public DataStation(String total_id, String stitle, String img_url, String xbody,
+                       double lat, double lng, String address) {
         this.total_id = total_id;
         this.stitle = stitle;
         this.img_url = img_url;
         this.xbody = xbody;
+        this.lat = lat;
+        this.lng = lng;
+        this.address = address;
     }
 
     public String getTotal_id() {
@@ -107,4 +111,6 @@ public class DataStation extends HashSet<String>{
     public void setMemo_time(String memo_time) {
         this.memo_time = memo_time;
     }
+
+
 }

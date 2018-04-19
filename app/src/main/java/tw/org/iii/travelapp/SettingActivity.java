@@ -1,36 +1,28 @@
 package tw.org.iii.travelapp;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import java.io.FileNotFoundException;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends Activity {
+public class SettingActivity extends Activity {
     private ListView main_list;
     private PopupWindow popupWindow;
     private Button btnConfirm;
@@ -43,7 +35,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_setting);
 
         main_list = findViewById(R.id.main_list);
         iv_home = findViewById(R.id.btn_home);
@@ -60,7 +52,7 @@ public class MainActivity extends Activity {
     private void init(){
         data1 = new String[]{"個人資料", "我的最愛", "佈景主題更換", "關於我"};
         data2 = new String[]{};
-        myAdapter = new MyAdapter(MainActivity.this);
+        myAdapter = new MyAdapter(SettingActivity.this);
         main_list.setAdapter(myAdapter);
         main_list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         main_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -109,7 +101,7 @@ public class MainActivity extends Activity {
             Log.v("brad", uri.toString());
             //抽象資料的接口
             GlideApp
-                    .with(MainActivity.this)
+                    .with(SettingActivity.this)
                     .load(data.getData())
                     .circleCrop()
 //                    .override((int)screenWidth, (int)newHeight)
@@ -144,6 +136,12 @@ public class MainActivity extends Activity {
                 iv_camera.setBackgroundColor(Color.BLACK);
                 iv_search.setBackgroundColor(Color.BLACK);
                 iv_setting.setBackgroundColor(Color.BLACK);
+
+//                LayoutInflater inflater = inflater = LayoutInflater.from(SettingActivity.this);
+//                View view = inflater.inflate(R.layout.activity_maps, null);
+
+                Intent intent = new Intent(SettingActivity.this, MapsActivity.class);
+                startActivity(intent);
             }
         });
 
