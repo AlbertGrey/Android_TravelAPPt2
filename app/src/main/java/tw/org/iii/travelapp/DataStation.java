@@ -1,5 +1,9 @@
 package tw.org.iii.travelapp;
 
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -7,110 +11,93 @@ import java.util.HashSet;
  */
 
 public class DataStation extends HashSet<String>{
-    String total_id;
-    String description;
-    String img_url;
-    String cat2;
-    String xbody;
-    String address;
-    String stitle;
-    double lng, lat;
-    String memo_time;
+    String total_id, stitle, name, type, CAT2, img_url,
+            MEMO_TIME, address, xbody;
+    HashMap photo;
+    double lat, lng;
+    ArrayList<String> photo_url;
 
     public DataStation(){
 
     }
 
     public DataStation(String total_id, String stitle, String img_url, String xbody,
-                       double lat, double lng, String address) {
+                         double lat, double lng, String address, String MEMO_TIME) {
         this.total_id = total_id;
         this.stitle = stitle;
         this.img_url = img_url;
+        this.address = address;
         this.xbody = xbody;
         this.lat = lat;
         this.lng = lng;
+        this.MEMO_TIME = MEMO_TIME;
+    }
+
+    public DataStation(String total_id, String name, String type, String CAT2,
+                       String MEMO_TIME, String address, String xbody,
+                       double lat, double lng, ArrayList<String> photo_url) {
+        this.total_id = total_id;
+        this.name = name;
+        this.type = type;
+        this.CAT2 = CAT2;
+        this.MEMO_TIME = MEMO_TIME;
         this.address = address;
+        this.xbody = xbody;
+        this.lat = lat;
+        this.lng = lng;
+        this.photo = photo;
+        this.photo_url = photo_url;
     }
 
     public String getTotal_id() {
         return total_id;
     }
 
-    public void setTotal_id(String total_id) {
-        this.total_id = total_id;
+    public String getName() {
+        return name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getType() {
+        return type;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public String getCAT2() {
+        return CAT2;
     }
 
-    public String getImg_url() {
-        return img_url;
-    }
-
-    public void setImg_url(String img_url) {
-        this.img_url = img_url;
-    }
-
-    public String getCat2() {
-        return cat2;
-    }
-
-    public void setCat2(String cat2) {
-        this.cat2 = cat2;
-    }
-
-    public String getXbody() {
-        return xbody;
-    }
-
-    public void setXbody(String xbody) {
-        this.xbody = xbody;
+    public String getMEMO_TIME() {
+        return MEMO_TIME;
     }
 
     public String getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getStitle() {
-        return stitle;
-    }
-
-    public void setStitle(String stitle) {
-        this.stitle = stitle;
-    }
-
-    public double getLng() {
-        return lng;
-    }
-
-    public void setLng(double lng) {
-        this.lng = lng;
+    public String getXbody() {
+        return xbody;
     }
 
     public double getLat() {
         return lat;
     }
 
-    public void setLat(double lat) {
-        this.lat = lat;
+    public double getLng() {
+        return lng;
     }
 
-    public String getMemo_time() {
-        return memo_time;
+    public HashMap getPhoto() {
+        return photo;
     }
 
-    public void setMemo_time(String memo_time) {
-        this.memo_time = memo_time;
+    public String getStitle() {
+        return stitle;
     }
 
+    public String getImg_url() {
+        return img_url;
+    }
 
+    public ArrayList<String> getPhoto_url() {
+        return photo_url;
+    }
 }

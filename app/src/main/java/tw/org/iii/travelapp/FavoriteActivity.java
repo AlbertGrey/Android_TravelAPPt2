@@ -42,10 +42,11 @@ public class FavoriteActivity extends AppCompatActivity {
     private float screenWidth, screenHeight, newHeight;
     private ImageView item_img;
     private String stitle, img_url;
-    private ArrayList<DataStation> dataList;
+    private ArrayList<DataStation> dataList, dataList2, dataList3;
     private RequestQueue queue;
     private String url = "http://36.235.38.228:8080/fsit04/User_favorite";
-    private String userId = "1";
+    private String userId = "2";
+    private String restUrl = "http://36.235.38.228:8080/fsit04/restaruant";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,16 +55,22 @@ public class FavoriteActivity extends AppCompatActivity {
 
         setTitle("我的最愛");
         queue= Volley.newRequestQueue(this);
+        getIntentData(); //取得Intent資料
+        getFavorite("1");
 
-        for(int i = 1; i <= 20; i++){
+        for(int i = 320; i <= 340; i++){
             addFavorite(userId, "" + i);
         }
 
         dataList = new ArrayList<>();
+        dataList2 = new ArrayList<>();
+        dataList3 = new ArrayList<>();
+        getRest();
         favorite_list = findViewById(R.id.favorite_list);
         getScreenSize();
         MyAsyncTask myAsyncTask = new MyAsyncTask();
-        myAsyncTask.execute(url);
+        myAsyncTask.execute(url + "?user_id=" + userId);
+//        myAsyncTask.execute(restUrl);
 //        init();
     }
     //取得螢幕大小
@@ -87,6 +94,10 @@ public class FavoriteActivity extends AppCompatActivity {
            }
         });
     }
+    //取得Intent資料
+    private void getIntentData(){
+        Intent intent = getIntent();
+    }
     //intent至detail頁面
     private void intentToDetail(int position){
         String img_url = dataList.get(position).getImg_url();
@@ -96,6 +107,7 @@ public class FavoriteActivity extends AppCompatActivity {
         double lat = dataList.get(position).getLat();
         double lng = dataList.get(position).getLng();
         String address = dataList.get(position).getAddress();
+        String meme_time = dataList.get(position).getMEMO_TIME();
 
         Intent intent = new Intent(FavoriteActivity.this, DetailActivity.class);
         intent.putExtra("stitle", total_id + "." + stitle);
@@ -104,6 +116,7 @@ public class FavoriteActivity extends AppCompatActivity {
         intent.putExtra("lat", lat);
         intent.putExtra("lng", lng);
         intent.putExtra("address", address);
+        intent.putExtra("memo_time", meme_time);
         startActivity(intent);
     }
 
@@ -193,7 +206,7 @@ public class FavoriteActivity extends AppCompatActivity {
                 double lat = obj.getDouble("lat");
 
                 DataStation data = new DataStation(
-                        total_id, stitle, img_url, xbody, lat, lng, address);
+                        total_id, stitle, img_url, xbody, lat, lng, address, memo_time);
                 dataList.add(data);
             }
         } catch (JSONException e) {
@@ -204,9 +217,9 @@ public class FavoriteActivity extends AppCompatActivity {
     private class MyAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... strings) {
-                String data = getData(strings[0]);
-                parseJSON(data);
-                return data;
+            String data = getData(strings[0]);
+            parseJSON(data);
+            return data;
         }
 
         @Override
@@ -243,7 +256,7 @@ public class FavoriteActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.v("brad",response);
+
                     }
                 }, null){
             @Override
@@ -268,7 +281,7 @@ public class FavoriteActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.v("brad",response);
+
                     }
                 }, null){
             @Override
@@ -288,9 +301,9 @@ public class FavoriteActivity extends AppCompatActivity {
      * @param user_id 用戶id
      */
     private void getFavorite(String user_id){
-        final String p1=user_id;
-        String url ="http://36.234.10.186:8080/fsit04/User_favorite?user_id="+p1;
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+        final String p1 = user_id;
+        String getFavoriteUrl = url + "?user_id=" + p1;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getFavoriteUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -302,44 +315,85 @@ public class FavoriteActivity extends AppCompatActivity {
     /**  用戶我的最愛parseJSON
      *
      * @param response
+     * total_id = 地點ID, name = 地點名稱, type = 地點類型, CAT2 = 分類
+     * MEMO_TIME = 營業時間, address = 地址, xbody = 簡介
+     * lat = 緯度, lng = 經度
+     * description = 照片的描述, url = 照片的url
      */
     private void parseGetFavorite(String response){
         try {
             JSONArray array1 = new JSONArray(response);
             for(int i= 0;i<array1.length();i++) {
+                ArrayList<String> photo_url = new ArrayList<>();
                 JSONObject ob1 =array1.getJSONObject(i);
-
+                String total_id = ob1.getString("total_id");
                 String name = ob1.getString("name");
-                Log.v("brad",name);
-
                 String type= ob1.getString("type");
-                Log.v("brad",type);
-
                 String CAT2 = ob1.getString("CAT2");
-                Log.v("brad",CAT2);
-
                 String MEMO_TIME = ob1.getString("MEMO_TIME");
-                Log.v("brad",MEMO_TIME);
-
                 String address = ob1.getString("address");
-                Log.v("brad",address);
-
                 String xbody = ob1.getString("xbody");
-                Log.v("brad",xbody);
-
-                String lat = ob1.getString("lat");
-                Log.v("brad",lat);
-
-                String lng = ob1.getString("lng");
-                Log.v("brad",lng);
-
+                double lat = ob1.getDouble("lat");
+                double lng = ob1.getDouble("lng");
                 JSONArray imgs =ob1.getJSONArray("Img");
-                for(int y= 0;y<array1.length();y++){
-                    String description =imgs.getJSONObject(y).getString("description");
-                    Log.v("brad",description);
+                for(int y = 0; y < imgs.length(); y++){
                     String imgUrl = imgs.getJSONObject(y).getString("url");
-                    Log.v("brad",imgUrl);
+                    photo_url.add(imgUrl);
                 }
+                DataStation data2 = new DataStation(total_id, name, type, CAT2, MEMO_TIME,
+                        address, xbody, lat, lng, photo_url);
+                dataList2.add(data2);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * 取得餐廳資訊
+     */
+    private void getRest(){
+        String url ="http://36.235.38.228:8080/fsit04/restaruant";
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        parseRest(response);
+                    }
+                }, null);
+
+        queue.add(stringRequest);
+    }
+    /**
+     *  解析餐廳資訊
+     * @param response
+     * total_id = 地點ID, stitle = 地點名稱, type = 地點類型, CAT2 = 分類
+     * MEMO_TIME = 營業時間, address = 地址, xbody = 簡介
+     * lat = 緯度, lnt = 經度, imgUrl = 照片的URL
+     */
+    private void parseRest(String response){
+        try {
+            JSONArray array1 = new JSONArray(response);
+            for(int i= 0;i<array1.length();i++) {
+                ArrayList<String> photo_url = new ArrayList<>();
+                JSONObject ob1 =array1.getJSONObject(i);
+                String total_id = ob1.getString("total_id");
+                String name = ob1.getString("stitle");
+                String type= ob1.getString("type");
+                String CAT2 = ob1.getString("CAT2");
+                String MEMO_TIME = ob1.getString("MEMO_TIME");
+                String address = ob1.getString("address");
+                String xbody = ob1.getString("xbody");
+                double lat = ob1.getDouble("lat");
+                double lng = ob1.getDouble("lng");
+
+                JSONArray imgs =ob1.getJSONArray("imgs");
+                for(int y= 0;y<imgs.length();y++){
+                    String imgUrl = imgs.getJSONObject(y).getString("url");
+                    photo_url.add(imgUrl);
+                }
+                DataStation data3 = new DataStation(total_id, name, type, CAT2, MEMO_TIME,
+                        address, xbody, lat, lng, photo_url);
+                dataList3.add(data3);
             }
         } catch (JSONException e) {
             e.printStackTrace();

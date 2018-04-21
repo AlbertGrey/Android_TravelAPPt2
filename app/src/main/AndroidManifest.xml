@@ -34,18 +34,24 @@ android:largeHeap="true"
 
         <activity
             android:name=".SettingActivity"
-            android:theme="@android:style/Theme.Light.NoTitleBar">
+            android:theme="@android:style/Theme.Light.NoTitleBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ProfileActivity" />
-        <activity android:name=".FavoriteActivity" />
-        <activity android:name=".ThemesActivity" />
-        <activity android:name=".DetailActivity"/>
-        <activity android:name=".MapsActivity"/>
+        <activity android:name=".ProfileActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".FavoriteActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ThemesActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".DetailActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MapsActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

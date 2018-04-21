@@ -8,9 +8,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,19 +41,21 @@ public class MyDragView extends LinearLayout{
     private SimpleAdapter simpleAdapter;
     private int upOrdown;
     private int  screenWidth,screenHeight;
+
+    private ArrayList<DataStation> dataList;
+    private Context drawView_context;
+
     public MyDragView(Context context){
         super(context);
 
     }
     public MyDragView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        drawView_context = context;
         data = new ArrayList<>();
-//        for(int i=0;i<20;i++){
-//            HashMap<String,String> m1 =new HashMap<>();
-//            m1.put("title",i+"");
-//            m1.put("texts","abc "+i);
-//            data.add(m1);
-//        }
+
+        dataList = new ArrayList();
+
         //利用mInflater 載入DragView的XML檔案
         LayoutInflater mInflater = LayoutInflater.from(context);
         myView = mInflater.inflate(R.layout.dragview, null);
@@ -49,41 +65,25 @@ public class MyDragView extends LinearLayout{
         screenWidth = metrics.widthPixels;
         screenHeight = metrics.heightPixels;
         Log.v("chad",screenHeight+"");
+
         addView(myView);
         intitListView();
+    }
 
-
-    }
-    //返回 ListView 的資料
-    public ArrayList<HashMap<String,String>> getDataList(){
-        return data;
-    }
-    //返回 ListView 的Adapter
-    public SimpleAdapter getSimpleAdapter(){
-        return simpleAdapter;
-    }
     //返回 MyListView
     public MyListView getListView(){
         return listView;
     }
     //初始化MyListView
     private void intitListView(){
-        String[] from =new String[]{"title","texts"};
-        int[] to =new int[]{R.id.title,R.id.texts};
         listView =myView.findViewById(R.id.listview);
-        simpleAdapter=new SimpleAdapter(this.getContext(),data, R.layout.sample_list,from,to);
-        listView.setAdapter(simpleAdapter);
-
     }
-
-
     //DragView 布局的時候 先設定初始位置0;
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         //這個一開始的高度
         this.setY(screenHeight/2);
-
     }
     //判斷LISTVIEW 是否置頂
     private boolean isFirstItemVisible() {
@@ -146,33 +146,20 @@ public class MyDragView extends LinearLayout{
             handInt =ev.getY();
             rowInt =ev.getRawY();
         } else if (ev.getAction() == MotionEvent.ACTION_MOVE) {
-                float temp = handInt - ev.getY();
-                //向上差過20 而且LISTVIEW置頂代表ACTION_MOVE_UP return true 給onTouchEvent;
-                if (temp >20 ) {
-                    if(this.getY()!=screenHeight/2&&isFirstItemVisible()) {
-                        return  true;
-                    }
-                //向下差過20 而且LISTVIEW置頂代表ACTION_MOVE_Down return true 給onTouchEvent;
-                } else if (temp < -20) {
-                    if(this.getY()==screenHeight/2&&isFirstItemVisible()) {
-                        return  true;
-                    }
+            float temp = handInt - ev.getY();
+            //向上差過20 而且LISTVIEW置頂代表ACTION_MOVE_UP return true 給onTouchEvent;
+            if (temp >20 ) {
+                if(this.getY()!=screenHeight/2&&isFirstItemVisible()) {
+                    return  true;
                 }
-
+                //向下差過20 而且LISTVIEW置頂代表ACTION_MOVE_Down return true 給onTouchEvent;
+            } else if (temp < -20) {
+                if(this.getY()==screenHeight/2&&isFirstItemVisible()) {
+                    return  true;
+                }
+            }
             return false;
         }
-
         return false;
-
-
-
-
-
-
-
-
-
-
     }
-
 }

@@ -1,6 +1,7 @@
 package tw.org.iii.travelapp;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -12,9 +13,9 @@ import android.widget.TextView;
 
 public class DetailActivity extends AppCompatActivity {
     private ImageView imageView;
-    private TextView textViewStitle, textViewDesc, textViewAddress, textViewLatLng;
+    private TextView textViewStitle, textViewDesc, textViewAddress, textViewMemo_time;
     private int screenWidth, screenHeight, newHeight;
-    private String stitle, xbody, img_url, address;
+    private String stitle, xbody, img_url, address, memo_time;
     private double lat, lng;
     private LinearLayout navigation;
 
@@ -33,7 +34,7 @@ public class DetailActivity extends AppCompatActivity {
         textViewStitle.setText(stitle);
         textViewDesc.setText(xbody);
         textViewAddress.setText(address);
-        textViewLatLng.setText(lat + ", " + lng);
+        textViewMemo_time.setText(memo_time);
         //設定photo
         GlideApp
                 .with(DetailActivity.this)
@@ -51,7 +52,7 @@ public class DetailActivity extends AppCompatActivity {
         navigation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                intentToMap();
+                gotoMap();
             }
         });
     }
@@ -69,7 +70,7 @@ public class DetailActivity extends AppCompatActivity {
         textViewStitle = findViewById(R.id.detail_textViewTitle);
         textViewDesc = findViewById(R.id.detail_textViewDesc);
         textViewAddress = findViewById(R.id.detail_textViewAddress);
-        textViewLatLng = findViewById(R.id.detail_textViewLatLng);
+        textViewMemo_time = findViewById(R.id.detail_textViewMemoTime);
         navigation = findViewById(R.id.detail_navigation);
     }
     //取得Intent資料
@@ -81,15 +82,17 @@ public class DetailActivity extends AppCompatActivity {
         lat = intent.getDoubleExtra("lat", -1);
         lng = intent.getDoubleExtra("lng", -1);
         address = intent.getStringExtra("address");
+        memo_time = intent.getStringExtra("memo_time");
     }
-    //intent到MapsActivity
-    private void intentToMap(){
-        Intent intent = new Intent(DetailActivity.this, MapsActivity.class);
-        intent.putExtra("stitle", stitle);
-        intent.putExtra("address", address);
-        intent.putExtra("lat", lat);
-        intent.putExtra("lng", lng);
-        startActivity(intent);
+    //開始導航
+    private void gotoMap() {
+        // Search for restaurants nearby
+        //google.navigation:q=a+street+address
+        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + lat + "," + lng);
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(mapIntent);
+        }
     }
-
 }

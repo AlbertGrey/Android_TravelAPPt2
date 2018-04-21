@@ -69,14 +69,14 @@ public class ProfileActivity extends AppCompatActivity {
         builder.setView(item)
                 .setTitle("修改密碼")
                 .setPositiveButton("確定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                EditText editText = item.findViewById(R.id.editText_password);
-                String newPassword = editText.getText().toString();
-                data2[1] = newPassword;
-                myAdapter.notifyDataSetChanged();
-            }
-        }).show();
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        EditText editText = item.findViewById(R.id.editText_password);
+                        String newPassword = editText.getText().toString();
+                        data2[1] = newPassword;
+                        myAdapter.notifyDataSetChanged();
+                    }
+                }).show();
     }
 
     //BaseAdapter for ListView

@@ -1,14 +1,25 @@
 package tw.org.iii.travelapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -19,22 +30,31 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback  {
 
     private GoogleMap mMap;
-
     private Marker[] marker;
-    private ArrayList<HashMap<String,Object>> destinations;
     private MyDragView dragView;
     private MyListView listView;
-    private ArrayList<HashMap<String,String>> data;
-    private SimpleAdapter adapter;
-    private String address, stitle, location;
-    private LatLng latLng;
+    private MyAdapter adapter;
+    private String stitle, img_url;
     private double lat, lng;
+    private ArrayList<DataStation> dataList, dataList2;
+    private String url = "http://36.235.38.228:8080/fsit04/User_favorite";
+    private String userId = "2";
+    private RequestQueue queue;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,87 +64,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         //TODO 從intent拿到資料後把要呈現的資料加入到  destinations是要畫標記的陣列  跟  data是LISTVIEW要呈現的資料
-
-        //接收intent->address
-        getIntentData();
-
-
-        getDragViewAndSetListView();
-
-        destinations = new ArrayList<>();
-//        //這是範例
-//        HashMap<String,Object> m1 = new HashMap<>();
-//        m1.put("lat",new LatLng(25.047155,121.514465));
-//        m1.put("position","臺北");
-//        destinations.add(m1);
-//        HashMap<String,Object> m2 = new HashMap<>();
-//        m2.put("lat",new LatLng(25.171855,121.440422));
-//        m2.put("position","淡水");
-//        destinations.add(m2);
-
-        HashMap<String, Object> mapData = new HashMap<>();
-        mapData.put("stitle", stitle);
-        mapData.put("location", location);
-        mapData.put("lat", lat);
-        mapData.put("lng", lng);
-        destinations.add(mapData);
-
-        //把資料加到ListView
-        for(HashMap<String,Object> hm : destinations){
-            HashMap<String,String> listItem = new HashMap<>();
-            listItem.put("title",destinations.indexOf(hm)+"");
-            listItem.put("texts",hm.get("location").toString());
-            data.add(listItem);
-        }
-
-
-//        //把資料加到ListView
-//        for(HashMap<String,Object> hm : destinations){
-//            HashMap<String,String> listItem = new HashMap<>();
-//            listItem.put("title",destinations.indexOf(hm)+"");
-//            listItem.put("texts",hm.get("position").toString());
-//            data.add(listItem);
-//        }
+        queue= Volley.newRequestQueue(this);
+        dataList = new ArrayList<>();
+        dataList2 = new ArrayList<>();
+        getFavorite(userId);
+        MyAsyncTask myAsyncTask = new MyAsyncTask();
+        myAsyncTask.execute(url + "?user_id=" + userId);
+//        marker = new Marker[destinations.size()];
+    }
+    //找出DragView 跟他裡面的ListView
+    private  void getDragViewAndSetListView(){
+        dragView = findViewById(R.id.myDragView);
+        listView = dragView.getListView();
+        adapter = new MyAdapter(this);
+        listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                mMap.clear();
-                HashMap<String, Object> hashMap = destinations.get(position);
+//                mMap.clear();
+                stitle = dataList.get(position).getStitle();
+                lat = dataList.get(position).getLat();
+                lng = dataList.get(position).getLng();
 
-//                latLng = (LatLng)hashMap.get("lat");
-                address = (String)hashMap.get("location");
-                double lat = (double)hashMap.get("lat");
-                double lng = (double)hashMap.get("lng");
-//                double lat = latLng.latitude;
-//                double lng = latLng.longitude;
-//                Log.v("brad", "address = " + address);
-//                Log.v("brad", "lat = " + lat);
-//                Log.v("brad", "lng = " + lng);
                 MarkerOptions m2 =new MarkerOptions()
                         .position(new LatLng(lat, lng))
-                        .title(address);
+                        .title(stitle);
                 mMap.addMarker(m2).showInfoWindow();
                 //移動視角到哪個經緯度
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat, lng)));
                 //設定視角的大小程度
                 mMap.moveCamera(CameraUpdateFactory.zoomTo(13.0f));
-            }
-        });
-        marker = new Marker[destinations.size()];
-    }
-    //找出DragView 跟他裡面的ListView
-    private  void getDragViewAndSetListView(){
-        dragView =findViewById(R.id.myDragView);
-        data = dragView.getDataList();
-        listView =dragView.getListView();
-        adapter=dragView.getSimpleAdapter();
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.v("chad",position+"");
             }
         });
     }
@@ -134,18 +106,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         //這個經緯度是預設視角的位置
         LatLng taipei = new LatLng(25.047155, 121.514465);
-
-//        for(HashMap<String,Object> hm : destinations){
-//            MarkerOptions m2 =new MarkerOptions()
-//                    .position((LatLng) hm.get("stitle"))
-//                    .title(hm.get("location").toString());
-//            mMap.addMarker(m2).showInfoWindow();
-//        }
-
-//        for(HashMap<String,Object> hm : destinations){
-//            MarkerOptions m2 =new MarkerOptions().position((LatLng) hm.get("lat")).title(hm.get("position").toString());
-//            mMap.addMarker(m2).showInfoWindow();
-//        }
 
         //移動視角到哪個經緯度
         mMap.moveCamera(CameraUpdateFactory.newLatLng(taipei));
@@ -174,22 +134,168 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             startActivity(mapIntent);
         }
     }
-
     //標記的clickListener
     private class MyOnMarkerClickListener implements GoogleMap.OnMarkerClickListener{
         @Override
         public boolean onMarkerClick(Marker marker) {
-            LatLng l1 =marker.getPosition();
+            LatLng latLng =marker.getPosition();
+            lat = latLng.latitude;
+            lng = latLng.longitude;
             return false;
         }
     }
 
-    private void getIntentData(){
-        Intent intent =getIntent();
-        stitle = intent.getStringExtra("stitle");
-        location = intent.getStringExtra("address");
-        lat = intent.getDoubleExtra("lat", -1);
-        lng = intent.getDoubleExtra("lng", -1);
+    protected class MyAdapter extends BaseAdapter {
+
+        private Context myContext;
+        private LayoutInflater inflater;
+
+        public MyAdapter(Context context){
+            this.myContext = context;
+            inflater = LayoutInflater.from(this.myContext);
+        }
+        //取得list的數量
+        @Override
+        public int getCount() {
+            return dataList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return position;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            //設置ListView的layout,沒有根目錄root值為null
+            if(convertView == null) {
+                convertView = inflater.inflate(R.layout.sample_list, null);
+            }
+            //取得ListView layout的每個view
+            TextView number = convertView.findViewById(R.id.sample_list_number);
+            TextView title = convertView.findViewById(R.id.sample_list_stitle);
+            //設定title
+            String stitle = dataList.get(position).getStitle();
+            number.setText("" + (position+1));
+            title.setText(stitle);
+            //回傳convertView
+            return convertView;
+        }
+    }
+    //解析JSON字串
+    private void parseJSON(String s){
+        try {
+            JSONArray array = new JSONArray(s);
+            for (int i=0; i<array.length(); i++){
+                JSONObject obj = array.getJSONObject(i);
+                JSONArray imgs = obj.getJSONArray("Img");
+                JSONObject obj2 = imgs.getJSONObject(0);
+                String total_id = obj.getString("total_id");
+                String description = obj2.getString("description");
+                img_url = obj2.getString("url");
+                String cat2 = obj.getString("CAT2");
+                String xbody = obj.getString("xbody");
+                String address = obj.getString("address");
+                stitle = obj.getString("name");
+                String memo_time = obj.getString("MEMO_TIME");
+                double lng = obj.getDouble("lng");
+                double lat = obj.getDouble("lat");
+
+                DataStation data = new DataStation(
+                        total_id, stitle, img_url, xbody, lat, lng, address, memo_time);
+                dataList.add(data);
+            }
+        } catch (JSONException e) {
+            Log.v("brad", e.toString());
+        }
     }
 
+    private class MyAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            String data = getData(strings[0]);
+            parseJSON(data);
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            getDragViewAndSetListView();
+        }
+        //從URL獲取JSON字串
+        private String getData(String url){
+            StringBuffer sb = new StringBuffer();
+            try {
+                URL newURL = new URL(url);
+                BufferedReader br = new BufferedReader(
+                        new InputStreamReader(newURL.openStream()));
+                String line;
+                while( (line = br.readLine()) != null){
+                    sb.append(line);
+                }
+            } catch (IOException e) {
+                Log.v("brad", e.toString());
+            }
+            return sb.toString();
+        }
+    }
+    /** 取得我的最愛
+     *
+     * @param user_id 用戶id
+     */
+    private void getFavorite(String user_id){
+        final String p1 = user_id;
+        String getFavoriteUrl = url + "?user_id=" + p1;
+        Log.v("brad", "getFavoriteUrl" + getFavoriteUrl);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getFavoriteUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        parseGetFavorite(response);
+                    }
+                }, null);
+        queue.add(stringRequest);
+    }
+    /**  用戶我的最愛parseJSON
+     *
+     * @param response
+     * total_id = 地點ID, name = 地點名稱, type = 地點類型, CAT2 = 分類
+     * MEMO_TIME = 營業時間, address = 地址, xbody = 簡介
+     * lat = 緯度, lng = 經度
+     * description = 照片的描述, url = 照片的url
+     */
+    private void parseGetFavorite(String response){
+        try {
+            JSONArray array1 = new JSONArray(response);
+            for(int i= 0;i<array1.length();i++) {
+                ArrayList<String> photo_url = new ArrayList<>();
+                JSONObject ob1 =array1.getJSONObject(i);
+                String total_id = ob1.getString("total_id");
+                String name = ob1.getString("name");
+                String type= ob1.getString("type");
+                String CAT2 = ob1.getString("CAT2");
+                String MEMO_TIME = ob1.getString("MEMO_TIME");
+                String address = ob1.getString("address");
+                String xbody = ob1.getString("xbody");
+                double lat = ob1.getDouble("lat");
+                double lng = ob1.getDouble("lng");
+                JSONArray imgs =ob1.getJSONArray("Img");
+                for(int y = 0; y < imgs.length(); y++){
+                    String imgUrl = imgs.getJSONObject(y).getString("url");
+                    photo_url.add(imgUrl);
+                }
+                DataStation data = new DataStation(total_id, name, type, CAT2, MEMO_TIME,
+                        address, xbody, lat, lng, photo_url);
+                dataList2.add(data);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }
