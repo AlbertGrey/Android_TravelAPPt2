@@ -44,9 +44,9 @@ public class FavoriteActivity extends AppCompatActivity {
     private String stitle, img_url;
     private ArrayList<DataStation> dataList, dataList2, dataList3;
     private RequestQueue queue;
-    private String url = "http://36.235.38.228:8080/fsit04/User_favorite";
-    private String userId = "2";
-    private String restUrl = "http://36.235.38.228:8080/fsit04/restaruant";
+    private String url = "http://36.235.39.18:8080/fsit04/User_favorite";
+    private String userId = "1";
+    private String restUrl = "http://36.235.39.18:8080/fsit04/restaruant";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,21 +56,18 @@ public class FavoriteActivity extends AppCompatActivity {
         setTitle("我的最愛");
         queue= Volley.newRequestQueue(this);
         getIntentData(); //取得Intent資料
-        getFavorite("1");
-
-        for(int i = 320; i <= 340; i++){
-            addFavorite(userId, "" + i);
-        }
+        getFavorite(HomePageActivity.userID); //取得我的最愛
 
         dataList = new ArrayList<>();
         dataList2 = new ArrayList<>();
         dataList3 = new ArrayList<>();
-        getRest();
+//        getRest();
         favorite_list = findViewById(R.id.favorite_list);
         getScreenSize();
         MyAsyncTask myAsyncTask = new MyAsyncTask();
-        myAsyncTask.execute(url + "?user_id=" + userId);
-//        myAsyncTask.execute(restUrl);
+        myAsyncTask.execute(
+                HomePageActivity.urlIP +
+                        "/fsit04/User_favorite?user_id=" + HomePageActivity.userID);
 //        init();
     }
     //取得螢幕大小
@@ -178,7 +175,7 @@ public class FavoriteActivity extends AppCompatActivity {
             GlideApp
                     .with(FavoriteActivity.this)
                     .load(dataList.get(position).getImg_url())
-                        .override((int)screenWidth, (int)newHeight)
+                    .override((int)screenWidth-100, (int)newHeight-100)
 //                        .centerCrop()
 //                        .placeholder(R.drawable.loading)
                     .into(item_img);
@@ -252,6 +249,9 @@ public class FavoriteActivity extends AppCompatActivity {
     private void addFavorite(String user_id,String total_id){
         final String p1 =user_id;
         final String p2=total_id;
+
+        String url =
+                HomePageActivity.urlIP + "/fsit04/User_favorite?user=" + HomePageActivity.userID;
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -275,6 +275,8 @@ public class FavoriteActivity extends AppCompatActivity {
      * @param total_id   地點的id
      */
     private void deleteFavorite(String user_id,String total_id){
+        String url =
+                HomePageActivity.urlIP + "/fsit04/User_favorite?user=" + HomePageActivity.userID;
         final String p1 = user_id;
         final String p2 = total_id;
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -302,7 +304,8 @@ public class FavoriteActivity extends AppCompatActivity {
      */
     private void getFavorite(String user_id){
         final String p1 = user_id;
-        String getFavoriteUrl = url + "?user_id=" + p1;
+        String getFavoriteUrl =
+                HomePageActivity.urlIP + "/fsit04/User_favorite?user=" + HomePageActivity.userID;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, getFavoriteUrl,
                 new Response.Listener<String>() {
                     @Override
@@ -352,7 +355,8 @@ public class FavoriteActivity extends AppCompatActivity {
      * 取得餐廳資訊
      */
     private void getRest(){
-        String url ="http://36.235.38.228:8080/fsit04/restaruant";
+        String url =
+                HomePageActivity.urlIP + "/fsit04/restaruant";
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override

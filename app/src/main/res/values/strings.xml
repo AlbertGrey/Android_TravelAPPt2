@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">TravelApp</string>
+    <string name="facebook_app_id">145244709649059</string>
+    <string name="fb_login_protocol_scheme">fb145244709649059</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="app_in">輸入景點或餐廳名稱</string>
 </resources>

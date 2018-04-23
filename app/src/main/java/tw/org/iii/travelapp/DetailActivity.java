@@ -39,9 +39,9 @@ public class DetailActivity extends AppCompatActivity {
         GlideApp
                 .with(DetailActivity.this)
                 .load(img_url)
-                        .override(screenWidth, newHeight)
-                        .centerCrop()
-//                        .placeholder(R.drawable.loading)
+                .override(screenWidth, newHeight)
+                .centerCrop()
+//                .placeholder(R.drawable.loading)
                 .into(imageView);
 
         setClickListener();

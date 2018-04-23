@@ -119,27 +119,14 @@ public class SettingActivity extends Activity {
         iv_home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iv_home.setBackgroundColor(Color.rgb(169,169,169));
-                iv_guide.setBackgroundColor(Color.BLACK);
-                iv_camera.setBackgroundColor(Color.BLACK);
-                iv_search.setBackgroundColor(Color.BLACK);
-                iv_setting.setBackgroundColor(Color.BLACK);
-
+                Intent intent = new Intent(SettingActivity.this, HomePageActivity.class);
+                startActivity(intent);
             }
         });
 
         iv_guide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iv_home.setBackgroundColor(Color.BLACK);
-                iv_guide.setBackgroundColor(Color.rgb(169,169,169));
-                iv_camera.setBackgroundColor(Color.BLACK);
-                iv_search.setBackgroundColor(Color.BLACK);
-                iv_setting.setBackgroundColor(Color.BLACK);
-
-//                LayoutInflater inflater = inflater = LayoutInflater.from(SettingActivity.this);
-//                View view = inflater.inflate(R.layout.activity_maps, null);
-
                 Intent intent = new Intent(SettingActivity.this, MapsActivity.class);
                 startActivity(intent);
             }
@@ -170,11 +157,7 @@ public class SettingActivity extends Activity {
         iv_setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iv_home.setBackgroundColor(Color.BLACK);
-                iv_guide.setBackgroundColor(Color.BLACK);
-                iv_camera.setBackgroundColor(Color.BLACK);
-                iv_search.setBackgroundColor(Color.BLACK);
-                iv_setting.setBackgroundColor(Color.rgb(169,169,169));
+
             }
         });
     }

@@ -51,8 +51,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String stitle, img_url;
     private double lat, lng;
     private ArrayList<DataStation> dataList, dataList2;
-    private String url = "http://36.235.38.228:8080/fsit04/User_favorite";
-    private String userId = "2";
     private RequestQueue queue;
 
     @Override
@@ -67,9 +65,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         queue= Volley.newRequestQueue(this);
         dataList = new ArrayList<>();
         dataList2 = new ArrayList<>();
-        getFavorite(userId);
+        getFavorite(HomePageActivity.userID);
         MyAsyncTask myAsyncTask = new MyAsyncTask();
-        myAsyncTask.execute(url + "?user_id=" + userId);
+        myAsyncTask.execute(
+                HomePageActivity.urlIP +
+                        "/fsit04/User_favorite?user_id=" +HomePageActivity.userID);
 //        marker = new Marker[destinations.size()];
     }
     //找出DragView 跟他裡面的ListView
@@ -251,7 +251,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     private void getFavorite(String user_id){
         final String p1 = user_id;
-        String getFavoriteUrl = url + "?user_id=" + p1;
+        String getFavoriteUrl =
+                HomePageActivity.urlIP +
+                        "/fsit04/User_favorite?user_id=" + HomePageActivity.userID;
         Log.v("brad", "getFavoriteUrl" + getFavoriteUrl);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, getFavoriteUrl,
                 new Response.Listener<String>() {
