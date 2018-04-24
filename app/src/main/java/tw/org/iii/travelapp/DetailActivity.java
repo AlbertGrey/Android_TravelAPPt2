@@ -1,23 +1,35 @@
 package tw.org.iii.travelapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class DetailActivity extends AppCompatActivity {
     private ImageView imageView;
+    private ScrollView scrollView;
+    private MyGridView gridView;
     private TextView textViewStitle, textViewDesc, textViewAddress, textViewMemo_time;
     private int screenWidth, screenHeight, newHeight;
     private String stitle, xbody, img_url, address, memo_time;
     private double lat, lng;
     private LinearLayout navigation;
+    private ArrayList<String> photoList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,15 +56,27 @@ public class DetailActivity extends AppCompatActivity {
 //                .placeholder(R.drawable.loading)
                 .into(imageView);
 
+        gridView.setAdapter(new ImageAdapter(this));
+
         setClickListener();
 
     }
     //設定導航按鈕事件
     private void setClickListener(){
+        //導航
         navigation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 gotoMap();
+            }
+        });
+        //相片集
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                Intent intent = new Intent(DetailActivity.this, ViewPagerActivity.class);
+                intent.putStringArrayListExtra("photos", photoList);
+                startActivity(intent);
             }
         });
     }
@@ -66,7 +90,9 @@ public class DetailActivity extends AppCompatActivity {
     }
     //找出views
     private void findViews(){
+        scrollView = findViewById(R.id.detail_scrollView);
         imageView = findViewById(R.id.detail_image);
+        gridView = findViewById(R.id.detail_gridView);
         textViewStitle = findViewById(R.id.detail_textViewTitle);
         textViewDesc = findViewById(R.id.detail_textViewDesc);
         textViewAddress = findViewById(R.id.detail_textViewAddress);
@@ -83,6 +109,7 @@ public class DetailActivity extends AppCompatActivity {
         lng = intent.getDoubleExtra("lng", -1);
         address = intent.getStringExtra("address");
         memo_time = intent.getStringExtra("memo_time");
+        photoList = intent.getStringArrayListExtra("photos");
     }
     //開始導航
     private void gotoMap() {
@@ -93,6 +120,45 @@ public class DetailActivity extends AppCompatActivity {
         mapIntent.setPackage("com.google.android.apps.maps");
         if (mapIntent.resolveActivity(getPackageManager()) != null) {
             startActivity(mapIntent);
+        }
+    }
+    //GridView的Adapter
+    public class ImageAdapter extends BaseAdapter {
+        private Context mContext;
+
+        public ImageAdapter(Context context) {
+            mContext = context;
+        }
+
+        public int getCount() {
+            return photoList.size();
+        }
+
+        public Object getItem(int position) {
+            return position;
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
+
+        // create a new ImageView for each item referenced by the Adapter
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ImageView imageView;
+            if (convertView == null) {
+                // if it's not recycled, initialize some attributes
+                imageView = new ImageView(mContext);
+                imageView.setLayoutParams(
+                        new ViewGroup.LayoutParams(screenWidth/3, newHeight/3));
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                imageView.setPadding(8, 8, 8, 8);
+            } else {
+                imageView = (ImageView) convertView;
+            }
+            GlideApp.with(mContext)
+                    .load(photoList.get(position))
+                    .into(imageView);
+            return imageView;
         }
     }
 }

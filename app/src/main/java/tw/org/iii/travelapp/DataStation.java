@@ -22,10 +22,22 @@ public class DataStation extends HashSet<String>{
     }
 
     public DataStation(String total_id, String stitle, String img_url, String xbody,
-                         double lat, double lng, String address, String MEMO_TIME) {
+                       double lat, double lng, String address, String MEMO_TIME) {
         this.total_id = total_id;
         this.stitle = stitle;
         this.img_url = img_url;
+        this.address = address;
+        this.xbody = xbody;
+        this.lat = lat;
+        this.lng = lng;
+        this.MEMO_TIME = MEMO_TIME;
+    }
+
+    public DataStation(String total_id, String stitle, ArrayList<String> photo_url, String xbody,
+                         double lat, double lng, String address, String MEMO_TIME) {
+        this.total_id = total_id;
+        this.stitle = stitle;
+        this.photo_url = photo_url;
         this.address = address;
         this.xbody = xbody;
         this.lat = lat;

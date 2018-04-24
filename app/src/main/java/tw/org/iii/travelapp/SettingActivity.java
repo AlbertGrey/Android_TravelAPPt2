@@ -1,6 +1,8 @@
 package tw.org.iii.travelapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -15,36 +17,38 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import libs.mjn.prettydialog.PrettyDialog;
 
 public class SettingActivity extends Activity {
-    private ListView main_list;
+    private ListView setting_list;
     private PopupWindow popupWindow;
     private Button btnConfirm;
     private String [] data1, data2;
     private MyAdapter myAdapter;
-    private LinearLayout iv_home, iv_guide, iv_camera, iv_search, iv_setting;
+    private LinearLayout iv_home, iv_guide, iv_camera, iv_favorite, iv_setting;
     private CircleImageView circleImageView;
-
+    private ImageView takePhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
 
-        main_list = findViewById(R.id.main_list);
+        setting_list = findViewById(R.id.setting_list);
         iv_home = findViewById(R.id.btn_home);
         iv_guide = findViewById(R.id.btn_guide);
         iv_camera = findViewById(R.id.btn_camera);
-        iv_search = findViewById(R.id.btn_search);
+        iv_favorite = findViewById(R.id.btn_favorite);
         iv_setting = findViewById(R.id.btn_setting);
-        circleImageView = findViewById(R.id.main_photo);
-
+        circleImageView = findViewById(R.id.setting_photo);
+        takePhoto = findViewById(R.id.setting_takePhoto);
         init();
         setIconListener();
     }
@@ -53,12 +57,11 @@ public class SettingActivity extends Activity {
         data1 = new String[]{"個人資料", "我的最愛", "佈景主題更換", "關於我"};
         data2 = new String[]{};
         myAdapter = new MyAdapter(SettingActivity.this);
-        main_list.setAdapter(myAdapter);
-        main_list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        main_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        setting_list.setAdapter(myAdapter);
+        setting_list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        setting_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Log.v("brad", "" + position);
                 switch (position){
                     case 0:
                         gotoProfile();
@@ -87,6 +90,13 @@ public class SettingActivity extends Activity {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 //取得相片後返回本畫面
                 startActivityForResult(intent, 1);
+            }
+        });
+
+        takePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }
@@ -138,19 +148,21 @@ public class SettingActivity extends Activity {
                 iv_home.setBackgroundColor(Color.BLACK);
                 iv_guide.setBackgroundColor(Color.BLACK);
                 iv_camera.setBackgroundColor(Color.rgb(169,169,169));
-                iv_search.setBackgroundColor(Color.BLACK);
+                iv_favorite.setBackgroundColor(Color.BLACK);
                 iv_setting.setBackgroundColor(Color.BLACK);
             }
         });
 
-        iv_search.setOnClickListener(new View.OnClickListener() {
+        iv_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iv_home.setBackgroundColor(Color.BLACK);
-                iv_guide.setBackgroundColor(Color.BLACK);
-                iv_camera.setBackgroundColor(Color.BLACK);
-                iv_search.setBackgroundColor(Color.rgb(169,169,169));
-                iv_setting.setBackgroundColor(Color.BLACK);
+//                iv_home.setBackgroundColor(Color.BLACK);
+//                iv_guide.setBackgroundColor(Color.BLACK);
+//                iv_camera.setBackgroundColor(Color.BLACK);
+//                iv_favorite.setBackgroundColor(Color.rgb(169,169,169));
+//                iv_setting.setBackgroundColor(Color.BLACK);
+                Intent intent = new Intent(SettingActivity.this, FavoriteActivity.class);
+                startActivity(intent);
             }
         });
 

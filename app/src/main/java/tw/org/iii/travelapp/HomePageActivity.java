@@ -34,7 +34,7 @@ public class HomePageActivity extends AppCompatActivity {
     private AttrPage page2;
     private FoodPage page3;
     private ArrayList<Fragment> fragments;
-    private LinearLayout iv_home, iv_guide, iv_camera, iv_search, iv_setting;
+    private LinearLayout iv_home, iv_guide, iv_camera, iv_favorite, iv_setting;
     private float screenWidth, screenHeight, newHeight;
     public static String urlIP = "http://36.235.39.18:8080";
     public static String userID = "1";
@@ -151,23 +151,6 @@ public class HomePageActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("美食"));
     }
 
-
-
-    public void topage1(View view) {
-    }
-
-    public void topage2(View view) {
-    }
-
-    public void topage3(View view) {
-    }
-
-    public void topage4(View view) {
-    }
-
-    public void topage5(View view) {
-    }
-
     private class MyAdapter extends FragmentPagerAdapter {
 
         public MyAdapter(FragmentManager fm) {
@@ -187,14 +170,15 @@ public class HomePageActivity extends AppCompatActivity {
             return 0;
         }
     }
+    //找出view
     private void findView(){
         iv_home = findViewById(R.id.btn_home);
         iv_guide = findViewById(R.id.btn_guide);
         iv_camera = findViewById(R.id.btn_camera);
-        iv_search = findViewById(R.id.btn_search);
+        iv_favorite = findViewById(R.id.btn_favorite);
         iv_setting = findViewById(R.id.btn_setting);
     }
-
+    //設定按鈕事件
     private void setIconListener(){
         iv_guide.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -210,19 +194,21 @@ public class HomePageActivity extends AppCompatActivity {
                 iv_home.setBackgroundColor(Color.BLACK);
                 iv_guide.setBackgroundColor(Color.BLACK);
                 iv_camera.setBackgroundColor(Color.rgb(169,169,169));
-                iv_search.setBackgroundColor(Color.BLACK);
+                iv_favorite.setBackgroundColor(Color.BLACK);
                 iv_setting.setBackgroundColor(Color.BLACK);
             }
         });
 
-        iv_search.setOnClickListener(new View.OnClickListener() {
+        iv_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iv_home.setBackgroundColor(Color.BLACK);
-                iv_guide.setBackgroundColor(Color.BLACK);
-                iv_camera.setBackgroundColor(Color.BLACK);
-                iv_search.setBackgroundColor(Color.rgb(169,169,169));
-                iv_setting.setBackgroundColor(Color.BLACK);
+//                iv_home.setBackgroundColor(Color.BLACK);
+//                iv_guide.setBackgroundColor(Color.BLACK);
+//                iv_camera.setBackgroundColor(Color.BLACK);
+//                iv_favorite.setBackgroundColor(Color.rgb(169,169,169));
+//                iv_setting.setBackgroundColor(Color.BLACK);
+                Intent intent = new Intent(HomePageActivity.this, FavoriteActivity.class);
+                startActivity(intent);
             }
         });
 

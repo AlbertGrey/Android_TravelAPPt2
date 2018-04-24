@@ -29,6 +29,7 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -66,18 +67,25 @@ public class FoodPage extends ListFragment {
             try {
                 jsonArray = new JSONArray(jstring);
                 for(int i=0;i<jsonArray.length();i++){
+                    ArrayList<String> photo_url = new ArrayList<>();
                     JSONObject jsonObject2 = jsonArray.getJSONObject(i);
                     JSONArray imgarray = jsonObject2.getJSONArray("imgs");
+                    for(int y = 0; y < imgarray.length(); y++){
+                        String imgUrl = imgarray.getJSONObject(y).getString("url");
+                        photo_url.add(imgUrl);
+                    }
                     JSONObject jsonObject3 = imgarray.getJSONObject(0);
                     AttrListModel listModel = new AttrListModel();
                     listModel.setAid(jsonObject2.getString("total_id"));
                     listModel.setName(jsonObject2.getString("stitle"));
                     listModel.setAddress(jsonObject2.getString("address"));
                     listModel.setDescription(jsonObject2.getString("xbody"));
+                    listModel.setOpentime(jsonObject2.getString("MEMO_TIME"));
                     listModel.setTel(jsonObject2.getString("phone"));
                     listModel.setImgs(jsonObject3.getString("url"));
                     listModel.setLat(jsonObject2.getDouble("lat"));
                     listModel.setLng(jsonObject2.getDouble("lng"));
+                    listModel.setPhoto_url(photo_url);
                     data.add(listModel);
                 }
                 return data;
@@ -177,16 +185,17 @@ public class FoodPage extends ListFragment {
                 @Override
                 public void onClick(View view) {
                     reslut = data.get(position);
-                    Intent intent = new Intent(getActivity(),DetailHomeActivity.class);
+                    Intent intent = new Intent(getActivity(),DetailActivity.class);
                     intent.putExtra("total_id",reslut.getAid());
-                    Log.v("brad", "詳細資料 = " + reslut.getAid());
-                    intent.putExtra("name",reslut.getName());
-                    intent.putExtra("addr",reslut.getAddress());
-                    intent.putExtra("img",reslut.getImgs());
-                    intent.putExtra("description",reslut.getDescription());
+                    intent.putExtra("stitle",reslut.getName());
+                    intent.putExtra("address",reslut.getAddress());
+                    intent.putExtra("img_url",reslut.getImgs());
+                    intent.putExtra("xbody",reslut.getDescription());
+                    intent.putExtra("memo_time",reslut.getOpentime());
                     intent.putExtra("phone",reslut.getTel());
                     intent.putExtra("lat", reslut.getLat());
                     intent.putExtra("lng", reslut.getLng());
+                    intent.putStringArrayListExtra("photos", reslut.getPhoto_url());
                     startActivity(intent);
                 }
             });

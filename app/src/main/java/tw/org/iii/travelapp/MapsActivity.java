@@ -254,7 +254,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String getFavoriteUrl =
                 HomePageActivity.urlIP +
                         "/fsit04/User_favorite?user_id=" + HomePageActivity.userID;
-        Log.v("brad", "getFavoriteUrl" + getFavoriteUrl);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, getFavoriteUrl,
                 new Response.Listener<String>() {
                     @Override

@@ -97,7 +97,7 @@ public class FavoriteActivity extends AppCompatActivity {
     }
     //intent至detail頁面
     private void intentToDetail(int position){
-        String img_url = dataList.get(position).getImg_url();
+        String img_url = dataList.get(position).getPhoto_url().get(0);
         String stitle = dataList.get(position).getStitle();
         String xbody = dataList.get(position).getXbody();
         String total_id = dataList.get(position).getTotal_id();
@@ -105,6 +105,7 @@ public class FavoriteActivity extends AppCompatActivity {
         double lng = dataList.get(position).getLng();
         String address = dataList.get(position).getAddress();
         String meme_time = dataList.get(position).getMEMO_TIME();
+        ArrayList<String> photos = dataList.get(position).getPhoto_url();
 
         Intent intent = new Intent(FavoriteActivity.this, DetailActivity.class);
         intent.putExtra("stitle", total_id + "." + stitle);
@@ -114,6 +115,7 @@ public class FavoriteActivity extends AppCompatActivity {
         intent.putExtra("lng", lng);
         intent.putExtra("address", address);
         intent.putExtra("memo_time", meme_time);
+        intent.putStringArrayListExtra("photos", photos);
         startActivity(intent);
     }
 
@@ -174,7 +176,7 @@ public class FavoriteActivity extends AppCompatActivity {
             //設定photo
             GlideApp
                     .with(FavoriteActivity.this)
-                    .load(dataList.get(position).getImg_url())
+                    .load(dataList.get(position).getPhoto_url().get(0))
                     .override((int)screenWidth-100, (int)newHeight-100)
 //                        .centerCrop()
 //                        .placeholder(R.drawable.loading)
@@ -188,12 +190,14 @@ public class FavoriteActivity extends AppCompatActivity {
         try {
             JSONArray array = new JSONArray(s);
             for (int i=0; i<array.length(); i++){
+                ArrayList<String> photo_url = new ArrayList<>();
                 JSONObject obj = array.getJSONObject(i);
                 JSONArray imgs = obj.getJSONArray("Img");
-                JSONObject obj2 = imgs.getJSONObject(0);
+                for(int y = 0; y < imgs.length(); y++){
+                    String imgUrl = imgs.getJSONObject(y).getString("url");
+                    photo_url.add(imgUrl);
+                }
                 String total_id = obj.getString("total_id");
-                String description = obj2.getString("description");
-                img_url = obj2.getString("url");
                 String cat2 = obj.getString("CAT2");
                 String xbody = obj.getString("xbody");
                 String address = obj.getString("address");
@@ -203,9 +207,10 @@ public class FavoriteActivity extends AppCompatActivity {
                 double lat = obj.getDouble("lat");
 
                 DataStation data = new DataStation(
-                        total_id, stitle, img_url, xbody, lat, lng, address, memo_time);
+                        total_id, stitle, photo_url, xbody, lat, lng, address, memo_time);
                 dataList.add(data);
             }
+
         } catch (JSONException e) {
             Log.v("brad", e.toString());
         }
@@ -305,11 +310,12 @@ public class FavoriteActivity extends AppCompatActivity {
     private void getFavorite(String user_id){
         final String p1 = user_id;
         String getFavoriteUrl =
-                HomePageActivity.urlIP + "/fsit04/User_favorite?user=" + HomePageActivity.userID;
+                HomePageActivity.urlIP + "/fsit04/User_favorite?user_id=" + HomePageActivity.userID;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, getFavoriteUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Log.v("brad", response);
                         parseGetFavorite(response);
                     }
                 }, null);

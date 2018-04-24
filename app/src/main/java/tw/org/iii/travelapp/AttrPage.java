@@ -27,9 +27,13 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+
+import libs.mjn.prettydialog.PrettyDialog;
+import libs.mjn.prettydialog.PrettyDialogCallback;
 
 
 public class AttrPage extends ListFragment {
@@ -42,7 +46,7 @@ public class AttrPage extends ListFragment {
     private float screenWidth,screenHeight,newHeight;
     private boolean ismember ;
     private RequestQueue queue;
-    public static String urlip = "http://36.235.39.18:8080";
+
 
 
     @Override
@@ -61,12 +65,17 @@ public class AttrPage extends ListFragment {
         protected LinkedList<AttrListModel> doInBackground(String... strings) {
             JSONArray jsonArray = null;
             data = new LinkedList<>();
-            jstring = JSONFuction.getJSONFromurl(urlip+"/fsit04/getData");
+            jstring = JSONFuction.getJSONFromurl(HomePageActivity.urlIP + "/fsit04/getData");
             try {
                 jsonArray = new JSONArray(jstring);
                 for(int i=0;i<jsonArray.length();i++){
+                    ArrayList<String> photo_url = new ArrayList<>();
                     JSONObject jsonObject2 = jsonArray.getJSONObject(i);
                     JSONArray imgarray = jsonObject2.getJSONArray("imgs");
+                    for(int y = 0; y < imgarray.length(); y++){
+                        String imgUrl = imgarray.getJSONObject(y).getString("url");
+                        photo_url.add(imgUrl);
+                    }
                     JSONObject jsonObject3 = imgarray.getJSONObject(0);
                     AttrListModel listModel = new AttrListModel();
                     listModel.setAid(jsonObject2.getString("total_id"));
@@ -77,6 +86,7 @@ public class AttrPage extends ListFragment {
                     listModel.setImgs(jsonObject3.getString("url"));
                     listModel.setLat(jsonObject2.getDouble("lat"));
                     listModel.setLng(jsonObject2.getDouble("lng"));
+                    listModel.setPhoto_url(photo_url);
                     data.add(listModel);
                 }
                 return data;
@@ -155,16 +165,16 @@ public class AttrPage extends ListFragment {
                 @Override
                 public void onClick(View view) {
                     reslut = data.get(position);
-                    Intent intent = new Intent(getActivity(),DetailHomeActivity.class);
+                    Intent intent = new Intent(getActivity(),DetailActivity.class);
                     intent.putExtra("total_id",reslut.getAid());
-                    Log.v("grey","attid = "+reslut.getAid());
-                    intent.putExtra("name",reslut.getName());
-                    intent.putExtra("addr",reslut.getAddress());
-                    intent.putExtra("img",reslut.getImgs());
-                    intent.putExtra("description",reslut.getDescription());
-                    intent.putExtra("opentime",reslut.getOpentime());
+                    intent.putExtra("stitle",reslut.getName());
+                    intent.putExtra("address",reslut.getAddress());
+                    intent.putExtra("img_url",reslut.getImgs());
+                    intent.putExtra("xbody",reslut.getDescription());
+                    intent.putExtra("memo_time",reslut.getOpentime());
                     intent.putExtra("lat", reslut.getLat());
                     intent.putExtra("lng", reslut.getLng());
+                    intent.putStringArrayListExtra("photos", reslut.getPhoto_url());
                     startActivity(intent);
                 }
             });
@@ -188,8 +198,32 @@ public class AttrPage extends ListFragment {
             holder.mesbtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                        Intent intent = new Intent(getActivity(),MessagePage.class);
-                        startActivity(intent);
+//                        Intent intent = new Intent(getActivity(),MessagePage.class);
+//                        startActivity(intent);
+                    new PrettyDialog(context)
+                            .setTitle("更換個人頭像")
+                            .setIcon(
+                                    R.drawable.pdlg_icon_info,     // icon resource
+                                    R.color.pdlg_color_green,      // icon tint
+                                    new PrettyDialogCallback() {   // icon OnClick listener
+                                        @Override
+                                        public void onClick() {
+                                            // Do what you gotta do
+                                        }
+                                    })
+                            .addButton(
+                                    "OK",					// button text
+                                    R.color.pdlg_color_white,		// button text color
+                                    R.color.pdlg_color_green,		// button background color
+                                    new PrettyDialogCallback() {		// button OnClick listener
+                                        @Override
+                                        public void onClick() {
+                                            // Do what you gotta do
+                                        }
+                                    }
+                            )
+
+                            .show();
                 }
             });
             return view;
@@ -211,7 +245,7 @@ public class AttrPage extends ListFragment {
     }
 
     private void addFavorite(String user_id,String total_id){
-        String url =urlip+"/fsit04/User_favorite";
+        String url = HomePageActivity.urlIP + "/fsit04/User_favorite";
 
         final String p1 =user_id;
         final String p2=total_id;

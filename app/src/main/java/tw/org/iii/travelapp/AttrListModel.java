@@ -1,5 +1,7 @@
 package tw.org.iii.travelapp;
 
+import java.util.ArrayList;
+
 /**
  * Created by wei-chengni on 2018/4/15.
  */
@@ -14,6 +16,7 @@ public class AttrListModel {
     private String adescription;
     private String aimgs;
     private double lat, lng;
+    private ArrayList<String> photo_url;
 
     public AttrListModel(){
     }
@@ -87,5 +90,13 @@ public class AttrListModel {
 
     public void setLng(double lng) {
         this.lng = lng;
+    }
+
+    public ArrayList<String> getPhoto_url() {
+        return photo_url;
+    }
+
+    public void setPhoto_url(ArrayList<String> photo_url) {
+        this.photo_url = photo_url;
     }
 }
