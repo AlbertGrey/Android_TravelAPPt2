@@ -3,11 +3,21 @@ package tw.org.iii.travelapp;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,34 +33,53 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.flyco.dialog.listener.OnOperItemClickL;
+import com.flyco.dialog.widget.NormalListDialog;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 import libs.mjn.prettydialog.PrettyDialog;
 
 public class SettingActivity extends Activity {
+    static final int REQUEST_TAKE_PHOTO = 1;
+    static final int IMAGE_REQUEST_CODE = 2;
+    static final int SELECT_PIC_NOUGAT = 3;
     private ListView setting_list;
     private PopupWindow popupWindow;
     private Button btnConfirm;
     private String [] data1, data2;
     private MyAdapter myAdapter;
-    private LinearLayout iv_home, iv_guide, iv_camera, iv_favorite, iv_setting;
+    private LinearLayout iv_home, iv_guide, iv_camera, iv_favorite;
     private CircleImageView circleImageView;
     private ImageView takePhoto;
+    private Uri photoURI, uriForFile;
+    private File photoFile, storageDir, mGalleryFile;
+    private String mCurrentPhotoPath, sticker, realPath;
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
+    private String path = Environment.getExternalStorageDirectory() +
+            "/Android/data/tw.org.iii.travelapp/files/Pictures";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
 
-        setting_list = findViewById(R.id.setting_list);
-        iv_home = findViewById(R.id.btn_home);
-        iv_guide = findViewById(R.id.btn_guide);
-        iv_camera = findViewById(R.id.btn_camera);
-        iv_favorite = findViewById(R.id.btn_favorite);
-        iv_setting = findViewById(R.id.btn_setting);
-        circleImageView = findViewById(R.id.setting_photo);
-        takePhoto = findViewById(R.id.setting_takePhoto);
+        sp = getSharedPreferences("sticker", MODE_PRIVATE);
+        editor = sp.edit();
+        sticker = sp.getString("sticker", null);
+        findView();
         init();
         setIconListener();
+
+        File file = new File(sticker);
+        Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+        circleImageView.setImageBitmap(bitmap);
     }
 
     private void init(){
@@ -63,6 +92,7 @@ public class SettingActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position){
+                    //個人資料
                     case 0:
                         gotoProfile();
                         break;
@@ -82,46 +112,103 @@ public class SettingActivity extends Activity {
         circleImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                //開啟Pictures畫面Type設定為image
-                intent.setType("image/*");
-                //使用Intent.ACTION_GET_CONTENT這個Action
-                //會開啟選取圖檔視窗讓您選取手機內圖檔
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                //取得相片後返回本畫面
-                startActivityForResult(intent, 1);
+                Intent intent = new Intent(SettingActivity.this, ShowStickerActivity.class);
+                startActivity(intent);
+
+//                Intent intent = new Intent();
+//                //開啟Pictures畫面Type設定為image
+//                intent.setType("image/*");
+//                //使用Intent.ACTION_GET_CONTENT這個Action
+//                //會開啟選取圖檔視窗讓您選取手機內圖檔
+//                intent.setAction(Intent.ACTION_GET_CONTENT);
+//                //取得相片後返回本畫面
+//                startActivityForResult(intent, 0);
             }
         });
-
+        //更換使用者頭像
         takePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String[] data = {"相機", "相簿"};
+                final NormalListDialog dialog = new NormalListDialog(SettingActivity.this, data);
+                dialog.title("請選擇")
+                        .titleTextSize_SP(20)
+                        .itemTextSize(20)
+                        .setOnOperItemClickL(new OnOperItemClickL() {
+                            @Override
+                            public void onOperItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                switch (position){
+                                    //從相機
+                                    case 0:
+                                        gotoTakePhoto();
+                                        dialog.dismiss();
+                                        break;
+                                    //從相簿
+                                    case 1:
+                                        gotoAlbum();
+                                        dialog.dismiss();
+                                        break;
+                                }
+                            }
+                        });
+                dialog.show();
             }
         });
+    }
+    //找出view
+    private void findView(){
+        setting_list = findViewById(R.id.setting_list);
+        iv_home = findViewById(R.id.btn_home);
+        iv_guide = findViewById(R.id.btn_guide);
+        iv_camera = findViewById(R.id.btn_camera);
+        iv_favorite = findViewById(R.id.btn_favorite);
+        circleImageView = findViewById(R.id.setting_photo);
+        takePhoto = findViewById(R.id.setting_takePhoto);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //當使用者按下確定後
-        if (resultCode == RESULT_OK) {
-            //取得圖檔的路徑位置
-            Uri uri = data.getData();
-            //寫log
-            Log.v("brad", uri.toString());
-            //抽象資料的接口
-            GlideApp
-                    .with(SettingActivity.this)
-                    .load(data.getData())
-                    .circleCrop()
-//                    .override((int)screenWidth, (int)newHeight)
-//                        .centerCrop()
-//                        .placeholder(R.drawable.loading)
-                    .into(circleImageView);
-        }
-
-
         super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK) {
+            switch (requestCode) {
+                //拍照回來
+                case REQUEST_TAKE_PHOTO:
+                    Uri dataUri = FileProvider.getUriForFile
+                            (this, "tw.org.iii.travelapp", photoFile);
+                    GlideApp
+                            .with(this)
+                            .load(dataUri)
+                            .circleCrop()
+                            .into(circleImageView);
+                    editor.putString("sticker", photoFile.getAbsolutePath());
+                    editor.commit();
+                    break;
+                //從相簿選擇照片回來-Nougat之前的版本
+                case IMAGE_REQUEST_CODE:
+                    Uri uri1 = data.getData();
+                    GlideApp
+                            .with(this)
+                            .load(uri1)
+                            .circleCrop()
+                            .into(circleImageView);
+                    realPath = getPathFromUri(SettingActivity.this,uri1);
+                    editor.putString("sticker", realPath);
+                    editor.commit();
+                    break;
+                //從相簿選擇照片回來-Nougat之後的版本
+                case SELECT_PIC_NOUGAT:
+                    Uri uri2 = data.getData();
+                    GlideApp
+                            .with(this)
+                            .load(uri2)
+                            .circleCrop()
+                            .into(circleImageView);
+                    realPath = getPathFromUri(SettingActivity.this,uri2);
+                    editor.putString("sticker", realPath);
+                    editor.commit();
+                    break;
+            }
+        }
     }
 
     private void setIconListener(){
@@ -129,8 +216,7 @@ public class SettingActivity extends Activity {
         iv_home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SettingActivity.this, HomePageActivity.class);
-                startActivity(intent);
+                finish();
             }
         });
 
@@ -145,37 +231,18 @@ public class SettingActivity extends Activity {
         iv_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iv_home.setBackgroundColor(Color.BLACK);
-                iv_guide.setBackgroundColor(Color.BLACK);
-                iv_camera.setBackgroundColor(Color.rgb(169,169,169));
-                iv_favorite.setBackgroundColor(Color.BLACK);
-                iv_setting.setBackgroundColor(Color.BLACK);
+
             }
         });
 
         iv_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                iv_home.setBackgroundColor(Color.BLACK);
-//                iv_guide.setBackgroundColor(Color.BLACK);
-//                iv_camera.setBackgroundColor(Color.BLACK);
-//                iv_favorite.setBackgroundColor(Color.rgb(169,169,169));
-//                iv_setting.setBackgroundColor(Color.BLACK);
                 Intent intent = new Intent(SettingActivity.this, FavoriteActivity.class);
                 startActivity(intent);
             }
         });
-
-        iv_setting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
     }
-
-
-
     //個人資料選單
     private void gotoProfile(){
         Intent intent = new Intent(this, ProfileActivity.class);
@@ -203,9 +270,7 @@ public class SettingActivity extends Activity {
         popupWindow.setTouchInterceptor(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-//                Log.v("brad", event.toString());
                 if(event.getAction() == MotionEvent.ACTION_UP){
-
                     popupWindow.dismiss();
                 }
                 return true;
@@ -216,7 +281,7 @@ public class SettingActivity extends Activity {
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                popupWindow.dismiss();
+//                popupWindow.dismiss();
             }
         });
         popupWindow.showAtLocation(view, Gravity.CENTER_HORIZONTAL, 0, 0);
@@ -254,12 +319,197 @@ public class SettingActivity extends Activity {
             convertView = inflater.inflate(R.layout.layout_setting, null);
             //取得ListView layout的每個view
             TextView item_title = convertView.findViewById(R.id.item_title);
-            TextView item_content = convertView.findViewById(R.id.item_content);
             //給值
             item_title.setText(data1[position]);
-            item_content.setText("");
             //回傳convertView
             return convertView;
         }
+    }
+    //使用相機拍照更換個人頭像
+    private void gotoTakePhoto(){
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // 確保有相機來處理intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File...
+                Log.v("brad", ex.toString());
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                photoURI = FileProvider.getUriForFile(
+                        SettingActivity.this,
+                        "tw.org.iii.travelapp",
+                        photoFile);
+                takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(Intent.createChooser(takePictureIntent, "TakePhoto"), REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+    //取得日期格式的照片名稱
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        // timeStamp的格式-> 20180420_004839
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        /**  getExternalFilesDir() 需要給的是type參數
+         *   傳回的是該app packagename 底下,參數的系統位置
+         *  storage/emulated/0/Android/data/tw.org.iii.takepicturetest/files/Pictures
+         */
+        storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+    //使用相簿照片更換個人頭像
+    private void gotoAlbum(){
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        mGalleryFile = new File(path, timeStamp + ".jpg");//相册的File对象
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {//如果大于等于7.0使用FileProvider
+            uriForFile = FileProvider.getUriForFile
+                    (this, "tw.org.iii.travelapp", mGalleryFile);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, uriForFile);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivityForResult(intent, SELECT_PIC_NOUGAT);
+        } else {
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mGalleryFile));
+            startActivityForResult(intent, IMAGE_REQUEST_CODE);
+        }
+    }
+    //使用uri取得照片實際存放位置
+    public static String getPathFromUri(final Context context, final Uri uri) {
+
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        // DocumentProvider
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+
+                // TODO handle non-primary volumes
+            }
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[] {
+                        split[1]
+                };
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+        }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+
+            // Return the remote address
+            if (isGooglePhotosUri(uri))
+                return uri.getLastPathSegment();
+
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        return null;
+    }
+
+    public static String getDataColumn(Context context, Uri uri, String selection,
+                                       String[] selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {
+                column
+        };
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is Google Photos.
+     */
+    public static boolean isGooglePhotosUri(Uri uri) {
+        return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
 }

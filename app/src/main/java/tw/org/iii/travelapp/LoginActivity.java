@@ -63,12 +63,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 // App code
-                Log.v("grey","onSuccess");
 
                 AccessToken accessToken = loginResult.getAccessToken();
                 String user_id = accessToken.getUserId();
                 String token = accessToken.getToken();
-                Log.v("grey",user_id +":"+token);
 
                 GraphRequest request =
                         GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
@@ -78,7 +76,6 @@ public class LoginActivity extends AppCompatActivity {
                                     String email = object.getString("email");
                                     String birthday = object.getString("birthday");
                                     String name = object.getString("name");
-                                    Log.v("grey",name+":"+email+":"+birthday);
                                     sighin(email,name,"123","2");
                                     finish();
                                 } catch (Exception e) {
@@ -127,7 +124,6 @@ public class LoginActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.v("grey","Responsea = "+response);
                     }
                 }, null){
             @Override

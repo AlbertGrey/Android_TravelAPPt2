@@ -49,7 +49,6 @@ public class LoginPage extends AppCompatActivity{
                 account = loginaccount.getText().toString();
                 passwd = loginpasswd.getText().toString();
                 sighin(account, "",passwd,"1");
-                Log.v("grey",account+":"+passwd);
                 loginaccount.setText("");
                 loginpasswd.setText("");
             }
@@ -74,13 +73,10 @@ public class LoginPage extends AppCompatActivity{
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.v("grey","00"+response.length());
                         String res = response.trim();
                         if (res.equals("erro")){
-                            Log.v("grey","error="+response);
                             errortest();
                         }else{
-                            Log.v("grey","error=qqqq");
                             ismember=true;
 
                         }

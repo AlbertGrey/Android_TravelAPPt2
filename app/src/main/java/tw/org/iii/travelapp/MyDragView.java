@@ -64,7 +64,6 @@ public class MyDragView extends LinearLayout{
         ma.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         screenWidth = metrics.widthPixels;
         screenHeight = metrics.heightPixels;
-        Log.v("chad",screenHeight+"");
 
         addView(myView);
         intitListView();

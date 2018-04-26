@@ -2,6 +2,7 @@ package tw.org.iii.travelapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -41,7 +42,7 @@ public class FavoriteActivity extends AppCompatActivity {
     private FavoriteActivity.MyAdapter myAdapter;
     private float screenWidth, screenHeight, newHeight;
     private ImageView item_img;
-    private String stitle, img_url;
+    private String stitle, img_url, backgroundColor;
     private ArrayList<DataStation> dataList, dataList2, dataList3;
     private RequestQueue queue;
     private String url = "http://36.235.39.18:8080/fsit04/User_favorite";
@@ -63,6 +64,7 @@ public class FavoriteActivity extends AppCompatActivity {
         dataList3 = new ArrayList<>();
 //        getRest();
         favorite_list = findViewById(R.id.favorite_list);
+//        favorite_list.setBackgroundColor(Color.parseColor("#ffe4e1"));
         getScreenSize();
         MyAsyncTask myAsyncTask = new MyAsyncTask();
         myAsyncTask.execute(
@@ -315,7 +317,6 @@ public class FavoriteActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.v("brad", response);
                         parseGetFavorite(response);
                     }
                 }, null);

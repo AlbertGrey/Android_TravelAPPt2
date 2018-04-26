@@ -26,14 +26,14 @@ public class JSONFuction {
             conn.connect();
 
             BufferedReader breader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            Log.v("grey", "reader = " + breader);
+//            Log.v("grey", "reader = " + breader);
             while ((jsonstring = breader.readLine()) != null) {
                 sb.append(jsonstring+"\n");
             }
-            Log.v("grey", "sb= " + sb);
+//            Log.v("grey", "sb= " + sb);
             breader.close();
             result = sb.toString();
-            Log.v("grey", "result = " + result);
+//            Log.v("grey", "result = " + result);
         }catch(Exception e){
             Log.v("grey","error333="+e.toString());
         }

@@ -34,48 +34,42 @@ android:largeHeap="true"
 
         <activity
             android:name=".SettingActivity"
-            android:theme="@android:style/Theme.Light.NoTitleBar"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Light.NoTitleBar" />
         <activity
             android:name=".ProfileActivity"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".FavoriteActivity"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ThemesActivity"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".DetailActivity"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MapsActivity"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".HomePageActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
+
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
         </activity>
-
-        <activity android:name=".DetailHomeActivity"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".LoginPage"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".MessagePage"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".DetailHomeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".LoginPage"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MessagePage"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -85,25 +79,24 @@ android:largeHeap="true"
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.facebook.CustomTabActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SearchPage"
             android:launchMode="singleTop"
@@ -111,11 +104,12 @@ android:largeHeap="true"
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-            <meta-data android:name="android.app.searchable"
+
+            <meta-data
+                android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-
-        <activity android:name=".ViewPagerActivity"/>
+        <activity android:name=".ViewPagerActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -124,10 +118,14 @@ android:largeHeap="true"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths">
-            </meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
 
+        <activity
+            android:name=".SharePhotoActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".ShowStickerActivity"></activity>
     </application>
 
 </manifest>

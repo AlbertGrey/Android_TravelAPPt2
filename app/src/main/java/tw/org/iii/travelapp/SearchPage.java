@@ -30,6 +30,7 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -75,13 +76,11 @@ public class SearchPage extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 doSearch(query);
-                Log.v("grey","submit = "+query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                Log.v("grey","change ="+newText);
                 doSearch(newText);
                 return false;
             }
@@ -98,23 +97,16 @@ public class SearchPage extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         new SearchAsync().execute(response);
-                        Log.v("grey","ressss = "+response);
                     }
                 }, null){
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String,String> m1 =new HashMap<>();
-
                 m1.put("param",p1);
-                Log.v("grey","param + "+m1);
                 return m1;
-
-
             }
         };
-
         queue.add(stringRequest);
-        Log.v("grey","queue = "+stringRequest);
     }
 
     private class SearchAsync extends AsyncTask <String ,Void,LinkedList<AttrListModel>>{
@@ -123,27 +115,29 @@ public class SearchPage extends AppCompatActivity {
         protected LinkedList<AttrListModel> doInBackground(String... strings) {
             String jstring = strings[0];
             data = new LinkedList<>();
-            Log.v("grey","data = "+jstring);
             try {
                 JSONArray jsonArray = new JSONArray(jstring);
-                Log.v("grey","jason"+jsonArray);
                 for(int i=0;i<jsonArray.length();i++){
+                    ArrayList<String> photo_url = new ArrayList<>();
                     JSONObject jsonObject2 = jsonArray.getJSONObject(i);
                     JSONArray imgarray = jsonObject2.getJSONArray("Img");
+                    for(int y = 0; y < imgarray.length(); y++){
+                        String imgUrl = imgarray.getJSONObject(y).getString("url");
+                        photo_url.add(imgUrl);
+                    }
                     JSONObject jsonObject3 = imgarray.getJSONObject(0);
-
                     AttrListModel listModel = new AttrListModel();
-
                     listModel.setAid(jsonObject2.getString("total_id"));
                     listModel.setName(jsonObject2.getString("name"));
                     listModel.setAddress(jsonObject2.getString("address"));
                     listModel.setOpentime(jsonObject2.getString("MEMO_TIME"));
                     listModel.setDescription(jsonObject2.getString("xbody"));
                     listModel.setImgs(jsonObject3.getString("url"));
+                    listModel.setLat(jsonObject2.getDouble("lat"));
+                    listModel.setLng(jsonObject2.getDouble("lng"));
+                    listModel.setPhoto_url(photo_url);
                     data.add(listModel);
                 }
-                Log.v("grey","json = "+jsonArray);
-                Log.v("grey","data = "+data);
                 return data;
             } catch (Exception e) {
                 Log.v("grey","error22 = " + e.toString());
@@ -154,11 +148,8 @@ public class SearchPage extends AppCompatActivity {
         @Override
         protected void onPostExecute(LinkedList jsonresult) {
             super.onPostExecute(jsonresult);
-            Log.v("grey","jsonsearch = "+jsonresult);
             adapter = new SearchAdapter(SearchPage.this,data);
             listView.setAdapter(adapter);
-            Log.v("grey","data=="+data);
-
         }
     }
 
@@ -206,34 +197,31 @@ public class SearchPage extends AppCompatActivity {
                 holder.itemimage = (ImageView)view.findViewById(R.id.item_image);
 
                 view.setTag(holder);
-                Log.v("grey","resaid = "+reslut.getAid());
             }else{
                 holder = (ViewHolder) view.getTag();
             }
             reslut = data.get(i);
             //set reslut to textview
             holder.itemtitle.setText(reslut.getName());
-            Log.v("grey","holdername = "+reslut.getName());
             holder.itemaddress.setText(reslut.getAddress());
-            Log.v("grey","holderaddr = "+data.get(i).getAddress());
             GlideApp.with(context).load(reslut.getImgs()).into(holder.itemimage);
-            Log.v("grey","data.image = "+data.get(i).getImgs());
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     reslut = data.get(i);
-                    Intent intent = new Intent(SearchPage.this,DetailHomeActivity.class);
+                    Intent intent = new Intent(SearchPage.this,DetailActivity.class);
                     intent.putExtra("total_id",reslut.getAid());
-                    Log.v("grey","attid = "+reslut.getAid());
-                    intent.putExtra("name",reslut.getName());
-                    intent.putExtra("addr",reslut.getAddress());
-                    intent.putExtra("img",reslut.getImgs());
-                    intent.putExtra("description",reslut.getDescription());
-                    intent.putExtra("opentime",reslut.getOpentime());
+                    intent.putExtra("stitle",reslut.getName());
+                    intent.putExtra("address",reslut.getAddress());
+                    intent.putExtra("img_url",reslut.getImgs());
+                    intent.putExtra("xbody",reslut.getDescription());
+                    intent.putExtra("memo_time",reslut.getOpentime());
+                    intent.putExtra("lat", reslut.getLat());
+                    intent.putExtra("lng", reslut.getLng());
+                    intent.putStringArrayListExtra("photos", reslut.getPhoto_url());
                     startActivity(intent);
                 }
             });
-
             return view;
         }
     }
@@ -244,6 +232,4 @@ public class SearchPage extends AppCompatActivity {
         public TextView itemaddress;
         public ImageView itemimage;
     }
-
-
 }

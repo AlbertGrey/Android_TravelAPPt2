@@ -61,25 +61,25 @@ public class ThemesActivity extends AppCompatActivity {
         if(color != null) {
             switch (color) {
                 case "紅色":
-                    themes_layout.setBackgroundColor(Color.RED);
+                    themes_layout.setBackgroundColor(Color.parseColor("#ff0000"));
                     break;
                 case "黃色":
-                    themes_layout.setBackgroundColor(Color.YELLOW);
+                    themes_layout.setBackgroundColor(Color.parseColor("#ffff00"));
                     break;
                 case "綠色":
-                    themes_layout.setBackgroundColor(Color.GREEN);
+                    themes_layout.setBackgroundColor(Color.parseColor("#00ff00"));
                     break;
                 case "藍色":
-                    themes_layout.setBackgroundColor(Color.BLUE);
+                    themes_layout.setBackgroundColor(Color.parseColor("#0000ff"));
                     break;
                 case "灰色":
-                    themes_layout.setBackgroundColor(Color.GRAY);
+                    themes_layout.setBackgroundColor(Color.parseColor("#bebebe"));
                     break;
                 case "深灰色":
-                    themes_layout.setBackgroundColor(Color.DKGRAY);
+                    themes_layout.setBackgroundColor(Color.parseColor("#a9a9a9"));
                     break;
                 case "白色(預設)":
-                    themes_layout.setBackgroundColor(Color.WHITE);
+                    themes_layout.setBackgroundColor(Color.parseColor("#ffffff"));
                     break;
             }
         }

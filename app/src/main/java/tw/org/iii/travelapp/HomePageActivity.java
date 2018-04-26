@@ -4,7 +4,10 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -12,17 +15,22 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
+import java.util.Date;
 
 public class HomePageActivity extends AppCompatActivity {
 
@@ -36,8 +44,10 @@ public class HomePageActivity extends AppCompatActivity {
     private ArrayList<Fragment> fragments;
     private LinearLayout iv_home, iv_guide, iv_camera, iv_favorite, iv_setting;
     private float screenWidth, screenHeight, newHeight;
-    public static String urlIP = "http://36.235.39.18:8080";
+    public static String urlIP = "http://125.230.19.49:8080";
     public static String userID = "1";
+    private File photoFile, storageDir;
+    private Uri photoURI, uriForFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +99,8 @@ public class HomePageActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_toolbar_menu,menu);
         MenuItem searchItem = menu.findItem(R.id.search_btn);
-
+        MenuItem shareItem = menu.findItem(R.id.share_btn);
+        //搜尋按鈕事件
         searchItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -102,10 +113,17 @@ public class HomePageActivity extends AppCompatActivity {
                 return false;
             }
         });
+        //分享按鈕事件
+        shareItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(HomePageActivity.this, SharePhotoActivity.class);
+                startActivity(intent);
+                return false;
+            }
+        });
         return true;
     }
-
-
 
     //詢問權限
     @Override
@@ -191,22 +209,13 @@ public class HomePageActivity extends AppCompatActivity {
         iv_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iv_home.setBackgroundColor(Color.BLACK);
-                iv_guide.setBackgroundColor(Color.BLACK);
-                iv_camera.setBackgroundColor(Color.rgb(169,169,169));
-                iv_favorite.setBackgroundColor(Color.BLACK);
-                iv_setting.setBackgroundColor(Color.BLACK);
+                gotoTakePhoto();
             }
         });
 
         iv_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                iv_home.setBackgroundColor(Color.BLACK);
-//                iv_guide.setBackgroundColor(Color.BLACK);
-//                iv_camera.setBackgroundColor(Color.BLACK);
-//                iv_favorite.setBackgroundColor(Color.rgb(169,169,169));
-//                iv_setting.setBackgroundColor(Color.BLACK);
                 Intent intent = new Intent(HomePageActivity.this, FavoriteActivity.class);
                 startActivity(intent);
             }
@@ -227,6 +236,56 @@ public class HomePageActivity extends AppCompatActivity {
         screenWidth = metrics.widthPixels;
         screenHeight = metrics.heightPixels;
         newHeight = screenWidth / 16 * 9;
+    }
+    //使用相機拍照
+    private void gotoTakePhoto(){
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        // 確保有相機來處理intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File...
+                Log.v("brad", ex.toString());
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                photoURI = FileProvider.getUriForFile(
+                        HomePageActivity.this,
+                        "tw.org.iii.travelapp",
+                        photoFile);
+                takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivity(Intent.createChooser(takePictureIntent, "TakePhoto"));
+                Log.v("brad", "photoURI = " + photoURI);
+            }
+        }
+    }
+    //取得日期格式的照片名稱
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        // timeStamp的格式-> 20180420_004839
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        /**  getExternalFilesDir() 需要給的是type參數
+         *   傳回的是該app packagename 底下,參數的系統位置
+         *  storage/emulated/0/Android/data/tw.org.iii.takepicturetest/files/Pictures
+         */
+        storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        Log.v("brad", "image = " + image.getAbsolutePath());
+        // Save a file: path for use with ACTION_VIEW intents
+        String mCurrentPhotoPath = image.getAbsolutePath();
+        Log.v("brad", "storageDir = " + storageDir);
+        image = new File(storageDir, "sticker.jpg");
+        return image;
     }
 }
 

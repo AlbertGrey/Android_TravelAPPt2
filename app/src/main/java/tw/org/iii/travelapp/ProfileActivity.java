@@ -43,7 +43,6 @@ public class ProfileActivity extends AppCompatActivity {
         profile_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.v("brad", "" + position);
                 switch (position){
                     case 0:
 
