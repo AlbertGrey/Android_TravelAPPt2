@@ -2,11 +2,11 @@ package tw.org.iii.travelapp;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +17,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,13 +33,21 @@ public class LoginPage extends AppCompatActivity{
     private EditText loginaccount,loginpasswd;
     private Button loginbtn,newbtn;
     private String account,passwd;
-    private boolean ismember=false;
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
+    private boolean issign;
+    private String memberid;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_page);
         queue= Volley.newRequestQueue(this);
+
+        sp = getSharedPreferences("memberdata",MODE_PRIVATE);
+        editor = sp.edit();
+        issign = sp.getBoolean("signin",true);
+        memberid = sp.getString("member","0");
 
         loginaccount = findViewById(R.id.login_account);
         loginpasswd = findViewById(R.id.login_passwd);
@@ -48,7 +59,7 @@ public class LoginPage extends AppCompatActivity{
             public void onClick(View view) {
                 account = loginaccount.getText().toString();
                 passwd = loginpasswd.getText().toString();
-                sighin(account, "",passwd,"1");
+                sighin(account, "",passwd,"normal");
                 loginaccount.setText("");
                 loginpasswd.setText("");
             }
@@ -68,7 +79,7 @@ public class LoginPage extends AppCompatActivity{
         final String p2=password;
         final String p3=type;
         final String p4=name;
-        String url = HomePageActivity.urlIP + "/fsit04/app/sighin";
+        String url =HomePageActivity.urlIP + "/fsit04/app/sighin";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -77,10 +88,19 @@ public class LoginPage extends AppCompatActivity{
                         if (res.equals("erro")){
                             errortest();
                         }else{
-                            ismember=true;
-
+                            try {
+                                JSONObject j2 = new JSONObject(res);
+                                String mid = j2.getString("id");
+                                editor.putBoolean("signin",true);
+                                editor.putString("memberid",mid);
+                                editor.commit();
+                                Intent intent =new Intent(getApplicationContext(),HomePageActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-
                     }
                 }, null){
             @Override
@@ -93,8 +113,6 @@ public class LoginPage extends AppCompatActivity{
                 return m1;
             }
         };
-
-
         queue.add(stringRequest);
     }
 
@@ -110,5 +128,8 @@ public class LoginPage extends AppCompatActivity{
                 }).show();
     }
 
-
+    @Override
+    public void finish() {
+        super.finish();
+    }
 }

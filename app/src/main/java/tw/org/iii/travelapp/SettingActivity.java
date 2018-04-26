@@ -7,6 +7,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -58,12 +59,13 @@ public class SettingActivity extends Activity {
     private CircleImageView circleImageView;
     private ImageView takePhoto;
     private Uri photoURI, uriForFile;
-    private File photoFile, storageDir, mGalleryFile;
-    private String mCurrentPhotoPath, sticker, realPath;
+    private File photoFile, storageDir, mGalleryFile, stickerFile;
+    private String mCurrentPhotoPath, sticker, realPath, drawableImageUri;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
     private String path = Environment.getExternalStorageDirectory() +
             "/Android/data/tw.org.iii.travelapp/files/Pictures";
+    private boolean isOriginal = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,14 +74,25 @@ public class SettingActivity extends Activity {
 
         sp = getSharedPreferences("sticker", MODE_PRIVATE);
         editor = sp.edit();
-        sticker = sp.getString("sticker", null);
         findView();
         init();
         setIconListener();
-
-        File file = new File(sticker);
-        Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-        circleImageView.setImageBitmap(bitmap);
+    }
+    //解決intent更換大頭照後並不會跑onCreate
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sticker = sp.getString("sticker", null);
+        if(sticker != null){
+            stickerFile = new File(sticker);
+            Bitmap bitmap = BitmapFactory.decodeFile(stickerFile.getAbsolutePath());
+            circleImageView.setImageBitmap(bitmap);
+            isOriginal = false;
+        }else {
+            Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.sticker);
+            circleImageView.setImageBitmap(bitmap);
+            isOriginal = true;
+        }
     }
 
     private void init(){
@@ -112,9 +125,15 @@ public class SettingActivity extends Activity {
         circleImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SettingActivity.this, ShowStickerActivity.class);
-                startActivity(intent);
-
+                if(isOriginal) {
+                    Intent intent = new Intent(SettingActivity.this, ShowStickerActivity.class);
+                    intent.putExtra("isOriginal", true);
+                    startActivity(intent);
+                }else{
+                    Intent intent = new Intent(SettingActivity.this, ShowStickerActivity.class);
+                    intent.putExtra("isOriginal", false);
+                    startActivity(intent);
+                }
 //                Intent intent = new Intent();
 //                //開啟Pictures畫面Type設定為image
 //                intent.setType("image/*");
@@ -405,7 +424,6 @@ public class SettingActivity extends Activity {
                 if ("primary".equalsIgnoreCase(type)) {
                     return Environment.getExternalStorageDirectory() + "/" + split[1];
                 }
-
                 // TODO handle non-primary volumes
             }
             // DownloadsProvider
@@ -431,12 +449,10 @@ public class SettingActivity extends Activity {
                 } else if ("audio".equals(type)) {
                     contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                 }
-
                 final String selection = "_id=?";
                 final String[] selectionArgs = new String[] {
                         split[1]
                 };
-
                 return getDataColumn(context, contentUri, selection, selectionArgs);
             }
         }
@@ -453,19 +469,16 @@ public class SettingActivity extends Activity {
         else if ("file".equalsIgnoreCase(uri.getScheme())) {
             return uri.getPath();
         }
-
         return null;
     }
 
     public static String getDataColumn(Context context, Uri uri, String selection,
                                        String[] selectionArgs) {
-
         Cursor cursor = null;
         final String column = "_data";
         final String[] projection = {
                 column
         };
-
         try {
             cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
                     null);
@@ -479,8 +492,6 @@ public class SettingActivity extends Activity {
         }
         return null;
     }
-
-
     /**
      * @param uri The Uri to check.
      * @return Whether the Uri authority is ExternalStorageProvider.
@@ -488,7 +499,6 @@ public class SettingActivity extends Activity {
     public static boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
-
     /**
      * @param uri The Uri to check.
      * @return Whether the Uri authority is DownloadsProvider.
@@ -496,7 +506,6 @@ public class SettingActivity extends Activity {
     public static boolean isDownloadsDocument(Uri uri) {
         return "com.android.providers.downloads.documents".equals(uri.getAuthority());
     }
-
     /**
      * @param uri The Uri to check.
      * @return Whether the Uri authority is MediaProvider.
@@ -504,7 +513,6 @@ public class SettingActivity extends Activity {
     public static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
-
     /**
      * @param uri The Uri to check.
      * @return Whether the Uri authority is Google Photos.

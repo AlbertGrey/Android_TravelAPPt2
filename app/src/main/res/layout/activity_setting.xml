@@ -26,7 +26,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:src="@drawable/djokovic2"
+            android:src="@drawable/sticker"
             android:padding="5dp"
             app:civ_fill_color="#fff"
             />

@@ -2,8 +2,8 @@ package tw.org.iii.travelapp;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -48,6 +48,10 @@ public class HomePageActivity extends AppCompatActivity {
     public static String userID = "1";
     private File photoFile, storageDir;
     private Uri photoURI, uriForFile;
+    public static SharedPreferences sp;
+    public static SharedPreferences.Editor editor;
+    public static boolean issignin;
+    public static String memberid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +150,11 @@ public class HomePageActivity extends AppCompatActivity {
         fragments.add(new HotPage());
         fragments.add(new AttrPage());
         fragments.add(new FoodPage());
+
+        sp = getSharedPreferences("memberdata",MODE_PRIVATE);
+        editor = sp.edit();
+        issignin = sp.getBoolean("signin",false);
+        memberid = sp.getString("memberid","1");
     }
 
     private void inittablayout(){
