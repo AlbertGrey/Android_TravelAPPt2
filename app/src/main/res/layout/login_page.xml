@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".LoginPage"
-    android:background="#DDDDDD"
+    android:background="#ffd"
     android:orientation="vertical">
     <ImageView
         android:id="@+id/login_image"

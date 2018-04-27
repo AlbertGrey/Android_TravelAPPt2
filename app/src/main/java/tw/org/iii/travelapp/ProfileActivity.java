@@ -3,6 +3,7 @@ package tw.org.iii.travelapp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,6 +15,8 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.githang.statusbar.StatusBarCompat;
 
 public class ProfileActivity extends AppCompatActivity {
     private ListView profile_list;
@@ -27,6 +30,8 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        //變更通知列底色
+        StatusBarCompat.setStatusBarColor(this, Color.parseColor("#4f4f4f"));
 
         setTitle("個人資料");
         profile_list = findViewById(R.id.profile_list);

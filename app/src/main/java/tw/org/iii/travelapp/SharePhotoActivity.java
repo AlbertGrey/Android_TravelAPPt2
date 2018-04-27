@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -13,7 +14,10 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -25,6 +29,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
 import com.bm.library.PhotoView;
+import com.githang.statusbar.StatusBarCompat;
+import com.pnikosis.materialishprogress.ProgressWheel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -50,47 +56,106 @@ public class SharePhotoActivity extends AppCompatActivity {
     private File mGalleryFile;
     private int statusCode;
     private MyHandler myHandler;
+    private ProgressWheel progressWheel;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share_photo);
+        //變更通知列底色
+        StatusBarCompat.setStatusBarColor(this, Color.parseColor("#4f4f4f"));
 
         findView();
-        setViewListener();
+//        setViewListener();
         myHandler = new MyHandler();
         queue= Volley.newRequestQueue(this);
     }
 
     private void findView(){
-        iv_TakePicture = findViewById(R.id.sharePhoto_TakePicture);
-        iv_Album = findViewById(R.id.sharePhoto_Album);
-        iv_Upload = findViewById(R.id.sharePhoto_UploadPhoto);
+//        iv_TakePicture = findViewById(R.id.sharePhoto_TakePicture);
+//        iv_Album = findViewById(R.id.sharePhoto_Album);
+//        iv_Upload = findViewById(R.id.sharePhoto_UploadPhoto);
         photoView = findViewById(R.id.sharePhoto_PhotoView);
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.inflateMenu(R.menu.share_photo_menu);
+        setSupportActionBar(toolbar);
     }
 
-    private void setViewListener(){
+//    private void setViewListener(){
+//        //拍照
+//        iv_TakePicture.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dispatchTakePictureIntent();
+//            }
+//        });
+//        //從相簿選取照片
+//        iv_Album.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                gotoAlbum();
+//            }
+//        });
+//        //上傳
+//        iv_Upload.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(bitmap != null) {
+//                    progressWheel = new ProgressWheel(SharePhotoActivity.this);
+//                    progressWheel.spin();
+//                    uploadFile();
+//                }else{
+//                    Toast.makeText(SharePhotoActivity.this,
+//                            "請選擇檔案上傳", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.share_photo_menu,menu);
+        MenuItem takePictureItem = menu.findItem(R.id.TakePicture);
+        MenuItem albumItem = menu.findItem(R.id.Album);
+        MenuItem uploadFileItem = menu.findItem(R.id.UploadPhoto);
+
         //拍照
-        iv_TakePicture.setOnClickListener(new View.OnClickListener() {
+        takePictureItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public void onClick(View v) {
-                dispatchTakePictureIntent();
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                Log.v("brad", "拍照");
+//                dispatchTakePictureIntent();
+                return false;
             }
         });
-        //從相簿選取照片
-        iv_Album.setOnClickListener(new View.OnClickListener() {
+        //從相簿選擇照片
+        albumItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public void onClick(View v) {
-                gotoAlbum();
+            public boolean onMenuItemClick(MenuItem item) {
+                Log.v("brad", "從相簿選擇照片");
+//                gotoAlbum();
+                return false;
             }
         });
-        //上傳
-        iv_Upload.setOnClickListener(new View.OnClickListener() {
+        //上傳照片
+        uploadFileItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
-            public void onClick(View v) {
-                uploadFile();
+            public boolean onMenuItemClick(MenuItem item) {
+                Log.v("brad", "上傳照片");
+//                if(bitmap != null) {
+//                    progressWheel = new ProgressWheel(SharePhotoActivity.this);
+//                    progressWheel.spin();
+//                    uploadFile();
+//                }else{
+//                    Toast.makeText(SharePhotoActivity.this,
+//                            "請選擇檔案上傳", Toast.LENGTH_SHORT).show();
+//                }
+                return false;
             }
         });
+        return true;
     }
 
     @Override
@@ -306,9 +371,11 @@ public class SharePhotoActivity extends AppCompatActivity {
             if(msg.what == 200){
                 Toast.makeText(SharePhotoActivity.this,
                         "上傳成功", Toast.LENGTH_SHORT).show();
+                progressWheel.stopSpinning();
             }else{
                 Toast.makeText(SharePhotoActivity.this,
                         "上傳失敗", Toast.LENGTH_SHORT).show();
+                progressWheel.stopSpinning();
             }
         }
     }

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="tw.org.iii.travelapp.ShowStickerActivity"
-    android:background="#000"
+    android:background="#4f4f4f"
     android:orientation="vertical">
 
     <com.bm.library.PhotoView

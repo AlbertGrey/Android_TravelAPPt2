@@ -12,6 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.githang.statusbar.StatusBarCompat;
+
 public class ThemesActivity extends AppCompatActivity {
     private LinearLayout themes_layout;
     private String list[] = {"紅色", "黃色", "藍色", "綠色", "灰色", "深灰色", "白色(預設)"};
@@ -22,6 +24,8 @@ public class ThemesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_themes);
+        //變更通知列底色
+        StatusBarCompat.setStatusBarColor(this, Color.parseColor("#4f4f4f"));
 
         setTitle("佈景主題更換");
         themes_layout = findViewById(R.id.themes_main);

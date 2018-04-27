@@ -3,6 +3,7 @@ package tw.org.iii.travelapp;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -26,6 +27,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.githang.statusbar.StatusBarCompat;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -52,7 +54,8 @@ public class SearchPage extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_layout);
-
+        //變更通知列底色
+        StatusBarCompat.setStatusBarColor(this, Color.parseColor("#4f4f4f"));
         toolbar = findViewById(R.id.search_toolbar);
         toolbar.inflateMenu(R.menu.search_menu);
         setSupportActionBar(toolbar);

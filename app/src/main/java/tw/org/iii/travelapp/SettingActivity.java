@@ -37,6 +37,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.flyco.dialog.listener.OnOperItemClickL;
 import com.flyco.dialog.widget.NormalListDialog;
+import com.githang.statusbar.StatusBarCompat;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +72,8 @@ public class SettingActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+        //變更通知列底色
+        StatusBarCompat.setStatusBarColor(this, Color.parseColor("#4f4f4f"));
 
         sp = getSharedPreferences("sticker", MODE_PRIVATE);
         editor = sp.edit();
@@ -96,7 +99,7 @@ public class SettingActivity extends Activity {
     }
 
     private void init(){
-        data1 = new String[]{"個人資料", "我的最愛", "佈景主題更換", "關於我"};
+        data1 = new String[]{"登入", "個人資料", "更換背景顏色", "我的照片集", "關於我"};
         data2 = new String[]{};
         myAdapter = new MyAdapter(SettingActivity.this);
         setting_list.setAdapter(myAdapter);
@@ -105,17 +108,28 @@ public class SettingActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position){
-                    //個人資料
+                    //登入&登出
                     case 0:
+                        Intent loginIntent = new Intent(
+                                SettingActivity.this, LoginActivity.class);
+                        startActivity(loginIntent);
+                        break;
+                    //個人資料
+                    case 1:
                         gotoProfile();
                         break;
-                    case 1:
-                        gotoFavorite();
-                        break;
+                    //更換背景顏色
                     case 2:
                         gotoTheme();
                         break;
+                    //我的相片集
                     case 3:
+                        Uri uri = Uri.parse(HomePageActivity.urlIP + "/fsit04/sign");
+                        Intent galleryIntent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(galleryIntent);
+                        break;
+                    //關於我
+                    case 4:
                         gotoAboutMe();
                         break;
                 }
@@ -229,16 +243,16 @@ public class SettingActivity extends Activity {
             }
         }
     }
-
+    //設定按鈕事件
     private void setIconListener(){
-
+        //首頁
         iv_home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
-
+        //導覽
         iv_guide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -246,19 +260,20 @@ public class SettingActivity extends Activity {
                 startActivity(intent);
             }
         });
-
+        //相機
         iv_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+//                gotoTakePhoto();
             }
         });
-
+        //我的最愛
         iv_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(SettingActivity.this, FavoriteActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
     }

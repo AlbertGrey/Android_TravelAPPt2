@@ -3,8 +3,12 @@ package tw.org.iii.travelapp;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -14,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,16 +28,20 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.githang.statusbar.StatusBarCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,13 +57,20 @@ public class FavoriteActivity extends AppCompatActivity {
     private String url = "http://36.235.39.18:8080/fsit04/User_favorite";
     private String userId = "1";
     private String restUrl = "http://36.235.39.18:8080/fsit04/restaruant";
+    private LinearLayout iv_home, iv_guide, iv_camera, iv_setting;
+    private File photoFile, storageDir;
+    private Uri photoURI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite);
-
+        //變更通知列底色
+        StatusBarCompat.setStatusBarColor(this, Color.parseColor("#4f4f4f"));
         setTitle("我的最愛");
+
+        findView();
+        setIconListener();
         queue= Volley.newRequestQueue(this);
         getIntentData(); //取得Intent資料
         getFavorite(HomePageActivity.userID); //取得我的最愛
@@ -80,6 +96,13 @@ public class FavoriteActivity extends AppCompatActivity {
         screenHeight = metrics.heightPixels;
         newHeight = screenWidth / 16 * 9;
     }
+    //找出view
+    private void findView(){
+        iv_home = findViewById(R.id.btn_home);
+        iv_guide = findViewById(R.id.btn_guide);
+        iv_camera = findViewById(R.id.btn_camera);
+        iv_setting = findViewById(R.id.btn_setting);
+    }
 
     private void init(){
         myAdapter = new MyAdapter(FavoriteActivity.this);
@@ -91,6 +114,42 @@ public class FavoriteActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 intentToDetail(position);
            }
+        });
+    }
+    //設定按鈕事件
+    private void setIconListener() {
+        //首頁
+        iv_home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(FavoriteActivity.this, HomePageActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        //導覽
+        iv_guide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(FavoriteActivity.this, MapsActivity.class);
+                startActivity(intent);
+            }
+        });
+        //相機
+        iv_camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gotoTakePhoto();
+            }
+        });
+        //設定
+        iv_setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(FavoriteActivity.this, SettingActivity.class);
+                startActivity(intent);
+                finish();
+            }
         });
     }
     //取得Intent資料
@@ -409,5 +468,55 @@ public class FavoriteActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+    //使用相機拍照
+    private void gotoTakePhoto(){
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        // 確保有相機來處理intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File...
+                Log.v("brad", ex.toString());
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                photoURI = FileProvider.getUriForFile(
+                        FavoriteActivity.this,
+                        "tw.org.iii.travelapp",
+                        photoFile);
+                takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivity(Intent.createChooser(takePictureIntent, "TakePhoto"));
+                Log.v("brad", "photoURI = " + photoURI);
+            }
+        }
+    }
+    //取得日期格式的照片名稱
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        // timeStamp的格式-> 20180420_004839
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        /**  getExternalFilesDir() 需要給的是type參數
+         *   傳回的是該app packagename 底下,參數的系統位置
+         *  storage/emulated/0/Android/data/tw.org.iii.takepicturetest/files/Pictures
+         */
+        storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        Log.v("brad", "image = " + image.getAbsolutePath());
+        // Save a file: path for use with ACTION_VIEW intents
+        String mCurrentPhotoPath = image.getAbsolutePath();
+        Log.v("brad", "storageDir = " + storageDir);
+        image = new File(storageDir, "sticker.jpg");
+        return image;
     }
 }

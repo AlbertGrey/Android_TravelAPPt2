@@ -149,7 +149,6 @@ public class AttrPage extends ListFragment {
                 view.setTag(holder);
                 holder.mesbtn = view.findViewById(R.id.item_message_btn);
                 holder.addbtn = view.findViewById(R.id.item_add_btn);
-//                Log.v("grey","resaid = "+reslut.getAid());
             }else{
                 holder = (ViewHolder) view.getTag();
             }

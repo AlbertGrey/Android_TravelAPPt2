@@ -54,12 +54,7 @@ android:largeHeap="true"
         <activity
             android:name=".HomePageActivity"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
 
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".DetailHomeActivity"
@@ -125,7 +120,15 @@ android:largeHeap="true"
             android:name=".SharePhotoActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-        <activity android:name=".ShowStickerActivity"></activity>
+        <activity android:name=".ShowStickerActivity" />
+        <activity android:name=".WelcomPageActivity">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

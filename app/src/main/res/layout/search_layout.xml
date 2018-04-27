@@ -6,14 +6,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    tools:context=".SearchPage">
+    tools:context=".SearchPage"
+    android:background="#ffd">
 
     <android.support.v7.widget.Toolbar
+        android:theme="@style/ToolbarTheme"
         android:id="@+id/search_toolbar"
-        app:title="sear"
+        app:title="search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary">
+        android:background="#4f4f4f">
     </android.support.v7.widget.Toolbar>
     <ListView
         android:id="@+id/search_list"

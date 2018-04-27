@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.bm.library.PhotoView;
+import com.githang.statusbar.StatusBarCompat;
 
 public class ShowStickerActivity extends AppCompatActivity {
     private PhotoView photoView;
@@ -19,6 +21,8 @@ public class ShowStickerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_sticker);
+        //變更通知列底色
+        StatusBarCompat.setStatusBarColor(this, Color.parseColor("#4f4f4f"));
 
         photoView = findViewById(R.id.showSticker_photoView);
         sp = getSharedPreferences("sticker", MODE_PRIVATE);

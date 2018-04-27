@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -26,6 +27,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.githang.statusbar.StatusBarCompat;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -47,7 +50,7 @@ public class HomePageActivity extends AppCompatActivity {
     public static String urlIP = "http://125.230.19.49:8080";
     public static String userID = "1";
     private File photoFile, storageDir;
-    private Uri photoURI, uriForFile;
+    private Uri photoURI;
     public static SharedPreferences sp;
     public static SharedPreferences.Editor editor;
     public static boolean issignin;
@@ -57,6 +60,8 @@ public class HomePageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homepage);
+        //變更通知列底色
+        StatusBarCompat.setStatusBarColor(this, Color.parseColor("#4f4f4f"));
 
         findView();
         getScreenSize();
@@ -207,6 +212,7 @@ public class HomePageActivity extends AppCompatActivity {
     }
     //設定按鈕事件
     private void setIconListener(){
+        //導覽
         iv_guide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -214,14 +220,14 @@ public class HomePageActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
+        //相機
         iv_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 gotoTakePhoto();
             }
         });
-
+        //我的最愛
         iv_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -229,7 +235,7 @@ public class HomePageActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
+        //設定
         iv_setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
