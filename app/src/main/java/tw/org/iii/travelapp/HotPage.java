@@ -3,6 +3,7 @@ package tw.org.iii.travelapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -41,11 +42,17 @@ public class HotPage extends ListFragment {
     private ListView listView;
     private String jstring;
     private JSONObject jsonObject;
-    private MylistAdapter adapter;
+    private MyhotlistAdapter adapter;
     private Button mesbtn,addbtn;
     private float screenWidth,screenHeight,newHeight;
-    private boolean ismember ;
     private RequestQueue queue;
+
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
+    private boolean issignin;
+    private String memberid;
+    private String memberemail;
+    private ViewHolder holder;
 
 
 
@@ -56,6 +63,14 @@ public class HotPage extends ListFragment {
         View v = inflater.inflate(R.layout.fragment_hot_page,container,false);
         listView=(ListView)v.findViewById(android.R.id.list);
         new attrHttpasync().execute();
+        sp = getActivity().getSharedPreferences("memberdata",Context.MODE_PRIVATE);
+        editor = sp.edit();
+        issignin = sp.getBoolean("signin",true);
+        memberid = sp.getString("memberid","");
+        memberemail = sp.getString("memberemail","");
+        Log.v("grey","hotsign="+issignin);
+
+
         return v;
     }
 
@@ -99,11 +114,11 @@ public class HotPage extends ListFragment {
         @Override
         protected void onPostExecute(LinkedList jsonresult) {
             super.onPostExecute(jsonresult);
-            adapter = new MylistAdapter(getActivity(),data);
+            adapter = new MyhotlistAdapter(getActivity(),data);
             setListAdapter(adapter);
         }
     }
-    public class MylistAdapter extends BaseAdapter {
+    public class MyhotlistAdapter extends BaseAdapter {
 
         private Context context;
         private LayoutInflater inflater;
@@ -113,8 +128,8 @@ public class HotPage extends ListFragment {
         private TextView itemaddr;
         private ImageView itemimage;
 
-        public MylistAdapter(Context context,
-                             LinkedList<AttrListModel> linklist) {
+        public MyhotlistAdapter(Context context,
+                                LinkedList<AttrListModel> linklist) {
             this.context = context;
             this.data = linklist;
             this.inflater = LayoutInflater.from(context);
@@ -141,7 +156,7 @@ public class HotPage extends ListFragment {
             reslut = data.get(position);
             if(view==null){
                 holder = new ViewHolder();
-                view = inflater.inflate(R.layout.item_layout,viewGroup,false);
+                view = inflater.inflate(R.layout.item_layout_hot,viewGroup,false);
                 inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 holder.itemtitle = (TextView)view.findViewById(R.id.item_title);
                 holder.itemaddress = (TextView)view.findViewById(R.id.item_addr);
@@ -183,14 +198,13 @@ public class HotPage extends ListFragment {
             holder.addbtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (ismember==true){
+                    if (issignin==true){
                         reslut = data.get(position);
-                        addFavorite("1",reslut.getAid());
+                        addFavorite(memberid,reslut.getAid());
                         showAletDialog();
                     }else {
                         Intent intent = new Intent(getActivity(),LoginActivity.class);
                         startActivity(intent);
-                        ismember=true;
                     }
 
                 }
@@ -239,7 +253,7 @@ public class HotPage extends ListFragment {
         newFragment.show(getFragmentManager(), "dialog");
     }
 
-    static class ViewHolder
+    public class ViewHolder
     {
         public ImageView itemimage;
         public TextView itemtitle;
@@ -272,7 +286,4 @@ public class HotPage extends ListFragment {
 
     }
 
-    private boolean ismember(){
-        return false;
-    }
 }

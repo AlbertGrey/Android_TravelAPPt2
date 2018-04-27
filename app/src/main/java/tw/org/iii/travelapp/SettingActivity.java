@@ -99,7 +99,7 @@ public class SettingActivity extends Activity {
     }
 
     private void init(){
-        data1 = new String[]{"登入", "個人資料", "更換背景顏色", "我的照片集", "關於我"};
+        data1 = new String[]{"登入/登出", "個人資料", "更換背景顏色", "我的照片集", "關於我"};
         data2 = new String[]{};
         myAdapter = new MyAdapter(SettingActivity.this);
         setting_list.setAdapter(myAdapter);

@@ -67,51 +67,16 @@ public class SharePhotoActivity extends AppCompatActivity {
         StatusBarCompat.setStatusBarColor(this, Color.parseColor("#4f4f4f"));
 
         findView();
-//        setViewListener();
         myHandler = new MyHandler();
         queue= Volley.newRequestQueue(this);
     }
 
     private void findView(){
-//        iv_TakePicture = findViewById(R.id.sharePhoto_TakePicture);
-//        iv_Album = findViewById(R.id.sharePhoto_Album);
-//        iv_Upload = findViewById(R.id.sharePhoto_UploadPhoto);
         photoView = findViewById(R.id.sharePhoto_PhotoView);
         toolbar = findViewById(R.id.toolbar);
         toolbar.inflateMenu(R.menu.share_photo_menu);
         setSupportActionBar(toolbar);
     }
-
-//    private void setViewListener(){
-//        //拍照
-//        iv_TakePicture.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                dispatchTakePictureIntent();
-//            }
-//        });
-//        //從相簿選取照片
-//        iv_Album.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                gotoAlbum();
-//            }
-//        });
-//        //上傳
-//        iv_Upload.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(bitmap != null) {
-//                    progressWheel = new ProgressWheel(SharePhotoActivity.this);
-//                    progressWheel.spin();
-//                    uploadFile();
-//                }else{
-//                    Toast.makeText(SharePhotoActivity.this,
-//                            "請選擇檔案上傳", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -125,8 +90,7 @@ public class SharePhotoActivity extends AppCompatActivity {
         takePictureItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                Log.v("brad", "拍照");
-//                dispatchTakePictureIntent();
+                dispatchTakePictureIntent();
                 return false;
             }
         });
@@ -134,8 +98,7 @@ public class SharePhotoActivity extends AppCompatActivity {
         albumItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Log.v("brad", "從相簿選擇照片");
-//                gotoAlbum();
+                gotoAlbum();
                 return false;
             }
         });
@@ -143,15 +106,14 @@ public class SharePhotoActivity extends AppCompatActivity {
         uploadFileItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Log.v("brad", "上傳照片");
-//                if(bitmap != null) {
-//                    progressWheel = new ProgressWheel(SharePhotoActivity.this);
-//                    progressWheel.spin();
-//                    uploadFile();
-//                }else{
-//                    Toast.makeText(SharePhotoActivity.this,
-//                            "請選擇檔案上傳", Toast.LENGTH_SHORT).show();
-//                }
+                if(bitmap != null) {
+                    progressWheel = new ProgressWheel(SharePhotoActivity.this);
+                    progressWheel.spin();
+                    uploadFile();
+                }else{
+                    Toast.makeText(SharePhotoActivity.this,
+                            "請選擇檔案上傳", Toast.LENGTH_SHORT).show();
+                }
                 return false;
             }
         });
