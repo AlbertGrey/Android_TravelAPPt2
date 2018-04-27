@@ -124,7 +124,7 @@ public class SettingActivity extends Activity {
                         break;
                     //我的相片集
                     case 3:
-                        Uri uri = Uri.parse(HomePageActivity.urlIP + "/fsit04/sign");
+                        Uri uri = Uri.parse(HomePageActivity.urlIP + "/fsit04/album");
                         Intent galleryIntent = new Intent(Intent.ACTION_VIEW, uri);
                         startActivity(galleryIntent);
                         break;
@@ -282,12 +282,7 @@ public class SettingActivity extends Activity {
         Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
-    //我的最愛
-    private void gotoFavorite(){
-        Intent intent = new Intent(this, FavoriteActivity.class);
-        startActivity(intent);
-    }
-    //更換佈景主題
+    //更換背景顏色
     private void gotoTheme(){
         Intent intent = new Intent(this, ThemesActivity.class);
         startActivity(intent);

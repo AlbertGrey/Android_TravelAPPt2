@@ -53,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         callbackManager = CallbackManager.Factory.create();
 
         loginbtn = findViewById(R.id.login_button2);
+        //一般登入
         loginbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
                 AccessToken accessToken = loginResult.getAccessToken();
                 String user_id = accessToken.getUserId();
                 String token = accessToken.getToken();
-
+                Log.v("brad", "user_id" + user_id);
                 GraphRequest request =
                         GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
                             @Override
@@ -99,11 +100,13 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onCancel() {
                 // App code
+                Log.v("brad", "onCancel");
             }
 
             @Override
             public void onError(FacebookException exception) {
                 // App code
+                Log.v("brad", "onError = " + exception.toString());
             }
         });
     }
