@@ -77,6 +77,19 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setReadPermissions("email");
         // If using in a fragment
 //        loginButton.setFragment(this);
+        //設定登出入狀態
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (issign){
+                    editor.putBoolean("signin", false);
+                    editor.commit();
+                }else {
+                    editor.putBoolean("signin", true);
+                    editor.commit();
+                }
+            }
+        });
         // Callback registration
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override

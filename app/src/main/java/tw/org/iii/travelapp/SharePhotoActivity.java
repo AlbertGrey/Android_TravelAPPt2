@@ -76,6 +76,7 @@ public class SharePhotoActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         toolbar.inflateMenu(R.menu.share_photo_menu);
         setSupportActionBar(toolbar);
+        progressWheel = findViewById(R.id.progress_wheel);
     }
 
     @Override
@@ -107,7 +108,6 @@ public class SharePhotoActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 if(bitmap != null) {
-                    progressWheel = new ProgressWheel(SharePhotoActivity.this);
                     progressWheel.spin();
                     uploadFile();
                 }else{
@@ -153,8 +153,7 @@ public class SharePhotoActivity extends AppCompatActivity {
                     break;
                 //從相簿選擇照片回來-Nougat之前的版本
                 case IMAGE_REQUEST_CODE:
-                    dataUri = FileProvider.getUriForFile
-                            (this, "tw.org.iii.travelapp", photoFile);
+                    dataUri = data.getData();
                     try {
                         bitmap = BitmapFactory.decodeStream(
                                 getContentResolver().openInputStream(dataUri));

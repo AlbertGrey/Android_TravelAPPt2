@@ -25,7 +25,7 @@ public class WelcomPageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_welcom_page);
         //變更通知列底色
         StatusBarCompat.setStatusBarColor(this, Color.parseColor("#4f4f4f"));
-        init();
+//        init();
         imageView = findViewById(R.id.welcome_image);
 
         imageView.setOnClickListener(new View.OnClickListener() {

@@ -17,6 +17,7 @@ public class AttrListModel {
     private String aimgs;
     private double lat, lng;
     private ArrayList<String> photo_url;
+    private boolean isLike;
 
     public AttrListModel(){
     }
@@ -98,5 +99,13 @@ public class AttrListModel {
 
     public void setPhoto_url(ArrayList<String> photo_url) {
         this.photo_url = photo_url;
+    }
+
+    public boolean isLike() {
+        return isLike;
+    }
+
+    public void setLike(boolean like) {
+        isLike = like;
     }
 }

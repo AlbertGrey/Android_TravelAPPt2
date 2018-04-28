@@ -201,7 +201,11 @@ public class HotPage extends ListFragment {
                     if (issignin==true){
                         reslut = data.get(position);
                         addFavorite(memberid,reslut.getAid());
-                        showAletDialog();
+                        new PrettyDialog(getContext())
+                                .setTitle("成功加入我的最愛")
+                                .setIcon(R.drawable.pdlg_icon_info)
+                                .setIconTint(R.color.pdlg_color_gray)
+                                .show();
                     }else {
                         Intent intent = new Intent(getActivity(),LoginActivity.class);
                         startActivity(intent);

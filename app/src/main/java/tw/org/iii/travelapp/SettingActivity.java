@@ -62,8 +62,8 @@ public class SettingActivity extends Activity {
     private Uri photoURI, uriForFile;
     private File photoFile, storageDir, mGalleryFile, stickerFile;
     private String mCurrentPhotoPath, sticker, realPath, drawableImageUri;
-    private SharedPreferences sp;
-    private SharedPreferences.Editor editor;
+    private SharedPreferences sp, sp1;
+    private SharedPreferences.Editor editor, editor1;
     private String path = Environment.getExternalStorageDirectory() +
             "/Android/data/tw.org.iii.travelapp/files/Pictures";
     private boolean isOriginal = false;
@@ -77,6 +77,8 @@ public class SettingActivity extends Activity {
 
         sp = getSharedPreferences("sticker", MODE_PRIVATE);
         editor = sp.edit();
+        sp1 = getSharedPreferences("memberdata", MODE_PRIVATE);
+        editor1 = sp1.edit();
         findView();
         init();
         setIconListener();
@@ -96,10 +98,21 @@ public class SettingActivity extends Activity {
             circleImageView.setImageBitmap(bitmap);
             isOriginal = true;
         }
+        boolean isLogin = sp1.getBoolean("signin", false);
+        if(isLogin){
+            data1[0] = "登出";
+        }else{
+            data1[0] = "登入";
+        }
+        myAdapter.notifyDataSetChanged();
+        Log.v("brad", "onResume"+ isLogin);
     }
 
+
     private void init(){
-        data1 = new String[]{"登入/登出", "個人資料", "更換背景顏色", "我的照片集", "關於我"};
+        data1 = new String[]{"登出", "個人資料", "更換背景顏色", "我的照片集", "關於我"};
+
+
         data2 = new String[]{};
         myAdapter = new MyAdapter(SettingActivity.this);
         setting_list.setAdapter(myAdapter);

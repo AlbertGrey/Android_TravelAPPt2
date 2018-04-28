@@ -62,4 +62,7 @@ dependencies {
 
     //變更通知列底色
     compile 'com.githang:status-bar-compat:latest.integration'
+
+    //Like Button
+    compile 'com.github.jd-alexander:LikeButton:0.2.3'
 }
