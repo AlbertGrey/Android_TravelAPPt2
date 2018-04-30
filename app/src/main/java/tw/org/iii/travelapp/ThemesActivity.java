@@ -16,10 +16,11 @@ import com.githang.statusbar.StatusBarCompat;
 
 public class ThemesActivity extends AppCompatActivity {
     private LinearLayout themes_layout;
-    private String list[] = {"紅色", "黃色", "藍色", "綠色", "灰色", "深灰色", "白色(預設)"};
+    private String list[] = {"黃色", "藍色", "綠色", "古白色", "甘露綠", "淡藍色", "淡黃色(系統預設)"};
     private String backgroundColor;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
+    private String[] color;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +33,13 @@ public class ThemesActivity extends AppCompatActivity {
         getThemeData();
 
         init();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String backGroundColor = sp.getString("backgroundColor", "#FFFFDD");
+        themes_layout.setBackgroundColor(Color.parseColor(backGroundColor));
     }
 
     private void init(){
@@ -57,39 +65,41 @@ public class ThemesActivity extends AppCompatActivity {
     }
 
     private void getThemeData(){
-        sp = getSharedPreferences("themedata", MODE_PRIVATE);
+        sp = getSharedPreferences("memberdata", MODE_PRIVATE);
         editor = sp.edit();
 
         String color = sp.getString("backgroundColor", null);
+        Log.v("brad", "color = " + color);
         //if判斷句用來解決清除app資料時，無法獲得資料而造成的例外
         if(color != null) {
             switch (color) {
-                case "紅色":
-                    themes_layout.setBackgroundColor(Color.parseColor("#ff0000"));
+                case "#FAEBD7":
+                    themes_layout.setBackgroundColor(Color.parseColor("#FAEBD7"));
                     break;
-                case "黃色":
-                    themes_layout.setBackgroundColor(Color.parseColor("#ffff00"));
+                case "#FFF68F":
+                    themes_layout.setBackgroundColor(Color.parseColor("#FFF68F"));
                     break;
-                case "綠色":
-                    themes_layout.setBackgroundColor(Color.parseColor("#00ff00"));
+                case "#AFEEEE":
+                    themes_layout.setBackgroundColor(Color.parseColor("#AFEEEE"));
                     break;
-                case "藍色":
-                    themes_layout.setBackgroundColor(Color.parseColor("#0000ff"));
+                case "#C1FFC1":
+                    themes_layout.setBackgroundColor(Color.parseColor("#C1FFC1"));
                     break;
-                case "灰色":
-                    themes_layout.setBackgroundColor(Color.parseColor("#bebebe"));
+                case "#F0FFF0":
+                    themes_layout.setBackgroundColor(Color.parseColor("#F0FFF0"));
                     break;
-                case "深灰色":
-                    themes_layout.setBackgroundColor(Color.parseColor("#a9a9a9"));
+                case "#BFEFFF":
+                    themes_layout.setBackgroundColor(Color.parseColor("#BFEFFF"));
                     break;
-                case "白色(預設)":
-                    themes_layout.setBackgroundColor(Color.parseColor("#ffffff"));
+                case "#FFFFDD":
+                    themes_layout.setBackgroundColor(Color.parseColor("#FFFFDD"));
                     break;
             }
         }
     }
     //套用按鈕
     public void apply(View view){
+        backgroundColor = getBackgroundColor(backgroundColor);
         editor.putString("backgroundColor", backgroundColor);
         editor.commit();
         Toast.makeText(this, "背景顏色 (" + backgroundColor + ")已套用",
@@ -99,28 +109,55 @@ public class ThemesActivity extends AppCompatActivity {
     private void setThemes(){
         if(backgroundColor != null) {
             switch (backgroundColor) {
-                case "紅色":
-                    themes_layout.setBackgroundColor(Color.RED);
+                case "古白色":
+                    themes_layout.setBackgroundColor(Color.parseColor("#FAEBD7"));
                     break;
                 case "黃色":
-                    themes_layout.setBackgroundColor(Color.YELLOW);
-                    break;
-                case "綠色":
-                    themes_layout.setBackgroundColor(Color.GREEN);
+                    themes_layout.setBackgroundColor(Color.parseColor("#FFF68F"));
                     break;
                 case "藍色":
-                    themes_layout.setBackgroundColor(Color.BLUE);
+                    themes_layout.setBackgroundColor(Color.parseColor("#AFEEEE"));
                     break;
-                case "灰色":
-                    themes_layout.setBackgroundColor(Color.GRAY);
+                case "綠色":
+                    themes_layout.setBackgroundColor(Color.parseColor("#C1FFC1"));
                     break;
-                case "深灰色":
-                    themes_layout.setBackgroundColor(Color.DKGRAY);
+                case "甘露綠":
+                    themes_layout.setBackgroundColor(Color.parseColor("#F0FFF0"));
                     break;
-                case "白色(預設)":
-                    themes_layout.setBackgroundColor(Color.WHITE);
+                case "淡藍色":
+                    themes_layout.setBackgroundColor(Color.parseColor("#BFEFFF"));
+                    break;
+                case "淡黃色(系統預設)":
+                    themes_layout.setBackgroundColor(Color.parseColor("#FFFFDD"));
                     break;
             }
         }
+    }
+
+    private String getBackgroundColor(String color){
+        switch (color){
+            case "古白色":
+                backgroundColor = "#FAEBD7";
+                break;
+            case "黃色":
+                backgroundColor = "#FFF68F";
+                break;
+            case "藍色":
+                backgroundColor = "#AFEEEE";
+                break;
+            case "綠色":
+                backgroundColor = "#C1FFC1";
+                break;
+            case "甘露綠":
+                backgroundColor = "#F0FFF0";
+                break;
+            case "淡藍色":
+                backgroundColor = "#BFEFFF";
+                break;
+            case "淡黃色(系統預設)":
+                backgroundColor = "#FFFFDD";
+                break;
+        }
+        return backgroundColor;
     }
 }

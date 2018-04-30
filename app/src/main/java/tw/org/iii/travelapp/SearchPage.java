@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -53,7 +54,7 @@ public class SearchPage extends AppCompatActivity {
     private LinkedList<AttrListModel> data;
     private String jstring;
     private SearchAsync searchAsync;
-
+    private LinearLayout backgroundColor;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
     private boolean issign;
@@ -66,6 +67,7 @@ public class SearchPage extends AppCompatActivity {
         setContentView(R.layout.search_layout);
         //變更通知列底色
         StatusBarCompat.setStatusBarColor(this, Color.parseColor("#4f4f4f"));
+        backgroundColor = findViewById(R.id.search_background);
         toolbar = findViewById(R.id.search_toolbar);
         toolbar.inflateMenu(R.menu.search_menu);
         setSupportActionBar(toolbar);
@@ -76,6 +78,13 @@ public class SearchPage extends AppCompatActivity {
         editor = sp.edit();
         issign = sp.getBoolean("signin",true);
         memberid = sp.getString("memberid","0");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String backGroundColor = sp.getString("backgroundColor", "#FFFFDD");
+        backgroundColor.setBackgroundColor(Color.parseColor(backGroundColor));
     }
 
     @Override

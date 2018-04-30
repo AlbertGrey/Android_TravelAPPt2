@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -43,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     private LoginButton loginButton;
     private CallbackManager callbackManager;
     private RequestQueue queue;
-
+    private LinearLayout backgroundColor;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
     private boolean issign;
@@ -63,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
         issign = sp.getBoolean("signin",true);
 
         callbackManager = CallbackManager.Factory.create();
-
+        backgroundColor =findViewById(R.id.login_background);
         loginbtn = findViewById(R.id.login_button2);
         loginbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,6 +130,13 @@ public class LoginActivity extends AppCompatActivity {
                 // App code
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String backGroundColor = sp.getString("backgroundColor", "#FFFFDD");
+        backgroundColor.setBackgroundColor(Color.parseColor(backGroundColor));
     }
 
     @Override

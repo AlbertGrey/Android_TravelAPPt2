@@ -3,6 +3,7 @@ package tw.org.iii.travelapp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -37,6 +38,14 @@ public class ProfileActivity extends AppCompatActivity {
         profile_list = findViewById(R.id.profile_list);
 
         init();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sp = getSharedPreferences("memberdata", MODE_PRIVATE);
+        String backGroundColor = sp.getString("backgroundColor", "#FFFFDD");
+        profile_list.setBackgroundColor(Color.parseColor(backGroundColor));
     }
 
     private void init(){

@@ -47,14 +47,14 @@ public class HomePageActivity extends AppCompatActivity {
     private ArrayList<Fragment> fragments;
     private LinearLayout iv_home, iv_guide, iv_camera, iv_favorite, iv_setting;
     private float screenWidth, screenHeight, newHeight;
-    public static String urlIP = "http://125.230.19.49:8080";
+    public static String urlIP = "http://118.170.13.75:8080";
     public static String userID = "1";
     private File photoFile, storageDir;
     private Uri photoURI;
 
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
-    private boolean issignin;
+    private boolean isSignIn;
     private String memberid;
     private String memberemail;
 
@@ -102,6 +102,13 @@ public class HomePageActivity extends AppCompatActivity {
 //        editor.putString("memberid","");
 //        editor.putString("memberemail","");
 //        editor.commit();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sp = getSharedPreferences("memberdata", MODE_PRIVATE);
+        isSignIn = sp.getBoolean("signin", false);
     }
 
     //menu
@@ -239,8 +246,13 @@ public class HomePageActivity extends AppCompatActivity {
         iv_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, FavoriteActivity.class);
-                startActivity(intent);
+                if (isSignIn) {
+                    Intent intent = new Intent(HomePageActivity.this, FavoriteActivity.class);
+                    startActivity(intent);
+                }else {
+                    Intent loginIntent = new Intent(HomePageActivity.this, LoginActivity.class);
+                    startActivity(loginIntent);
+                }
             }
         });
         //設定

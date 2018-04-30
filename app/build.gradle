@@ -65,4 +65,7 @@ dependencies {
 
     //Like Button
     compile 'com.github.jd-alexander:LikeButton:0.2.3'
+
+    //AndroidLikeButton
+    compile 'com.jackandphantom.android:androidlikebutton:1.2.0'
 }

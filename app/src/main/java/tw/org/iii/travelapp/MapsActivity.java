@@ -245,6 +245,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             getDragViewAndSetListView();
+            String backGroundColor = sp.getString("backgroundColor", "#FFFFDD");
+            listView.setBackgroundColor(Color.parseColor(backGroundColor));
         }
         //從URL獲取JSON字串
         private String getData(String url){

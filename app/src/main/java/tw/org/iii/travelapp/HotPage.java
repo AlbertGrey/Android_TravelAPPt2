@@ -4,6 +4,7 @@ package tw.org.iii.travelapp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -46,7 +48,7 @@ public class HotPage extends ListFragment {
     private Button mesbtn,addbtn;
     private float screenWidth,screenHeight,newHeight;
     private RequestQueue queue;
-
+    private FrameLayout backgroundColor;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
     private boolean issignin;
@@ -62,6 +64,7 @@ public class HotPage extends ListFragment {
         queue= Volley.newRequestQueue(getContext());
         View v = inflater.inflate(R.layout.fragment_hot_page,container,false);
         listView=(ListView)v.findViewById(android.R.id.list);
+        backgroundColor = (FrameLayout)v.findViewById(R.id.hot_background);
         new attrHttpasync().execute();
         sp = getActivity().getSharedPreferences("memberdata",Context.MODE_PRIVATE);
         editor = sp.edit();
@@ -72,6 +75,13 @@ public class HotPage extends ListFragment {
 
 
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        String backGroundColor = sp.getString("backgroundColor", "#FFFFDD");
+        backgroundColor.setBackgroundColor(Color.parseColor(backGroundColor));
     }
 
     private class attrHttpasync extends AsyncTask<String, Void, LinkedList<AttrListModel>> {

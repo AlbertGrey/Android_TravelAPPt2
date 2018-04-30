@@ -2,6 +2,7 @@ package tw.org.iii.travelapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +34,7 @@ public class DetailActivity extends AppCompatActivity {
     private double lat, lng;
     private LinearLayout navigation;
     private ArrayList<String> photoList;
+    private LinearLayout backgroundColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,15 @@ public class DetailActivity extends AppCompatActivity {
         setClickListener();
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sp = getSharedPreferences("memberdata", MODE_PRIVATE);
+        String backGroundColor = sp.getString("backgroundColor", "#FFFFDD");
+        backgroundColor.setBackgroundColor(Color.parseColor(backGroundColor));
+    }
+
     //設定導航按鈕事件
     private void setClickListener(){
         //導航
@@ -102,6 +113,7 @@ public class DetailActivity extends AppCompatActivity {
         textViewAddress = findViewById(R.id.detail_textViewAddress);
         textViewMemo_time = findViewById(R.id.detail_textViewMemoTime);
         navigation = findViewById(R.id.detail_navigation);
+        backgroundColor = findViewById(R.id.detail_background);
     }
     //取得Intent資料
     private void getIntentData(){

@@ -8,9 +8,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -40,6 +42,7 @@ public class LoginPage extends AppCompatActivity{
     private SharedPreferences.Editor editor;
     private boolean issign;
     private String memberid;
+    private LinearLayout backgroundColor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,6 +62,7 @@ public class LoginPage extends AppCompatActivity{
         loginpasswd = findViewById(R.id.login_passwd);
         loginbtn = findViewById(R.id.login_button);
         newbtn = findViewById(R.id.login_newbutton);
+        backgroundColor = findViewById(R.id.login_page_background);
 
         loginbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,7 +84,15 @@ public class LoginPage extends AppCompatActivity{
             }
         });
     }
-    private void sighin(String mail,String name,String password,String type){
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String backGroundColor = sp.getString("backgroundColor", "#FFFFDD");
+        backgroundColor.setBackgroundColor(Color.parseColor(backGroundColor));
+    }
+
+    private void sighin(String mail, String name, String password, String type){
         final String p1=mail;
         final String p2=password;
         final String p3=type;

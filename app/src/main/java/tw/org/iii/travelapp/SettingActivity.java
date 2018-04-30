@@ -56,17 +56,18 @@ public class SettingActivity extends Activity {
     private Button btnConfirm;
     private String [] data1, data2;
     private MyAdapter myAdapter;
-    private LinearLayout iv_home, iv_guide, iv_camera, iv_favorite;
+    private LinearLayout iv_home, iv_guide, iv_camera, iv_favorite, backgroundColor;
     private CircleImageView circleImageView;
     private ImageView takePhoto;
     private Uri photoURI, uriForFile;
     private File photoFile, storageDir, mGalleryFile, stickerFile;
     private String mCurrentPhotoPath, sticker, realPath, drawableImageUri;
-    private SharedPreferences sp, sp1;
-    private SharedPreferences.Editor editor, editor1;
+    private SharedPreferences sp;
+    private SharedPreferences.Editor editor;
     private String path = Environment.getExternalStorageDirectory() +
             "/Android/data/tw.org.iii.travelapp/files/Pictures";
     private boolean isOriginal = false;
+    private boolean isSignIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,18 +76,20 @@ public class SettingActivity extends Activity {
         //變更通知列底色
         StatusBarCompat.setStatusBarColor(this, Color.parseColor("#4f4f4f"));
 
-        sp = getSharedPreferences("sticker", MODE_PRIVATE);
+        sp = getSharedPreferences("memberdata", MODE_PRIVATE);
         editor = sp.edit();
-        sp1 = getSharedPreferences("memberdata", MODE_PRIVATE);
-        editor1 = sp1.edit();
         findView();
         init();
+
         setIconListener();
     }
     //解決intent更換大頭照後並不會跑onCreate
     @Override
     protected void onResume() {
         super.onResume();
+        //設定背景顏色
+        setBackgroundColor();
+
         sticker = sp.getString("sticker", null);
         if(sticker != null){
             stickerFile = new File(sticker);
@@ -98,19 +101,19 @@ public class SettingActivity extends Activity {
             circleImageView.setImageBitmap(bitmap);
             isOriginal = true;
         }
-        boolean isLogin = sp1.getBoolean("signin", false);
+        boolean isLogin = sp.getBoolean("signin", false);
         if(isLogin){
             data1[0] = "登出";
         }else{
             data1[0] = "登入";
         }
         myAdapter.notifyDataSetChanged();
-        Log.v("brad", "onResume"+ isLogin);
+        Log.v("brad", "onResume isLogin = "+ isLogin);
     }
 
 
     private void init(){
-        data1 = new String[]{"登出", "個人資料", "更換背景顏色", "我的照片集", "關於我"};
+        data1 = new String[]{"登出", "個人資料", "背景顏色", "相片集", "關於我"};
 
 
         data2 = new String[]{};
@@ -210,6 +213,17 @@ public class SettingActivity extends Activity {
         iv_favorite = findViewById(R.id.btn_favorite);
         circleImageView = findViewById(R.id.setting_photo);
         takePhoto = findViewById(R.id.setting_takePhoto);
+        backgroundColor = findViewById(R.id.setting_background);
+    }
+
+    private void setBackgroundColor(){
+        String backGroundColor = sp.getString("backgroundColor", "#FFFFDD");
+        backgroundColor.setBackgroundColor(Color.parseColor(backGroundColor));
+//        if (backgroundColor != null){
+//            backgroundColor.setBackgroundColor(Color.parseColor(backGroundColor));
+//        }else{
+//            backgroundColor.setBackgroundColor(Color.parseColor("#ff0000"));
+//        }
     }
 
     @Override
@@ -284,9 +298,15 @@ public class SettingActivity extends Activity {
         iv_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SettingActivity.this, FavoriteActivity.class);
-                startActivity(intent);
-                finish();
+                isSignIn = sp.getBoolean("signin", false);
+                if (isSignIn) {
+                    Intent intent = new Intent(SettingActivity.this, FavoriteActivity.class);
+                    startActivity(intent);
+                    finish();
+                }else {
+                    Intent loginIntent = new Intent(SettingActivity.this, LoginActivity.class);
+                    startActivity(loginIntent);
+                }
             }
         });
     }

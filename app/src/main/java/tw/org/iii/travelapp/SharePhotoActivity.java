@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -58,6 +59,7 @@ public class SharePhotoActivity extends AppCompatActivity {
     private MyHandler myHandler;
     private ProgressWheel progressWheel;
     private Toolbar toolbar;
+    private FrameLayout backgroundColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,12 +73,21 @@ public class SharePhotoActivity extends AppCompatActivity {
         queue= Volley.newRequestQueue(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sp = getSharedPreferences("memberdata", MODE_PRIVATE);
+        String backGroundColor = sp.getString("backgroundColor", "#FFFFDD");
+        backgroundColor.setBackgroundColor(Color.parseColor(backGroundColor));
+    }
+
     private void findView(){
         photoView = findViewById(R.id.sharePhoto_PhotoView);
         toolbar = findViewById(R.id.toolbar);
         toolbar.inflateMenu(R.menu.share_photo_menu);
         setSupportActionBar(toolbar);
         progressWheel = findViewById(R.id.progress_wheel);
+        backgroundColor =findViewById(R.id.sharePhoto_background);
     }
 
     @Override

@@ -56,12 +56,11 @@ public class FavoriteActivity extends AppCompatActivity {
     private ArrayList<DataStation> dataList, dataList2, dataList3;
     private RequestQueue queue;
     private String url = "http://36.235.39.18:8080/fsit04/User_favorite";
-    //    private String userId = "1";
     private String restUrl = "http://36.235.39.18:8080/fsit04/restaruant";
     private LinearLayout iv_home, iv_guide, iv_camera, iv_setting;
     private File photoFile, storageDir;
     private Uri photoURI;
-
+    private LinearLayout backgroundColor_Layout;
     private SharedPreferences sp;
     private SharedPreferences.Editor editor;
     private boolean issignin;
@@ -115,6 +114,14 @@ public class FavoriteActivity extends AppCompatActivity {
         iv_guide = findViewById(R.id.btn_guide);
         iv_camera = findViewById(R.id.btn_camera);
         iv_setting = findViewById(R.id.btn_setting);
+        backgroundColor_Layout = findViewById(R.id.favorite_background);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String backGroundColor = sp.getString("backgroundColor", "#FFFFDD");
+        backgroundColor_Layout.setBackgroundColor(Color.parseColor(backGroundColor));
     }
 
     private void init(){
