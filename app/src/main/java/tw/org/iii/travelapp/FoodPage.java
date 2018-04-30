@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -66,7 +67,7 @@ public class FoodPage extends ListFragment {
         backgroundColor = (FrameLayout)v.findViewById(R.id.food_background);
         sp = getActivity().getSharedPreferences("memberdata",Context.MODE_PRIVATE);
         editor = sp.edit();
-        issignin = sp.getBoolean("signin",true);
+        issignin = sp.getBoolean("signin",false);
         memberid = sp.getString("memberid","");
         memberemail = sp.getString("memberemail","");
         Log.v("grey","foodsign="+issignin);
@@ -242,8 +243,8 @@ public class FoodPage extends ListFragment {
         public ImageView itemimage;
         public TextView itemtitle;
         public TextView itemaddress;
-        public Button mesbtn;
-        public Button addbtn;
+        public ImageButton mesbtn;
+        public ImageButton addbtn;
     }
 //     //* @param mail        信箱 test123@gmail.com
 //     //* @param password    密碼 test123

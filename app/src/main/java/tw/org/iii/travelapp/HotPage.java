@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -68,7 +69,7 @@ public class HotPage extends ListFragment {
         new attrHttpasync().execute();
         sp = getActivity().getSharedPreferences("memberdata",Context.MODE_PRIVATE);
         editor = sp.edit();
-        issignin = sp.getBoolean("signin",true);
+        issignin = sp.getBoolean("signin",false);
         memberid = sp.getString("memberid","");
         memberemail = sp.getString("memberemail","");
         Log.v("grey","hotsign="+issignin);
@@ -272,8 +273,8 @@ public class HotPage extends ListFragment {
         public ImageView itemimage;
         public TextView itemtitle;
         public TextView itemaddress;
-        public Button mesbtn;
-        public Button addbtn;
+        public ImageButton mesbtn;
+        public ImageButton addbtn;
     }
 
     private void addFavorite(String user_id,String total_id){
